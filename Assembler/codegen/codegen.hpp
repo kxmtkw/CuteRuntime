@@ -10,17 +10,35 @@ extern "C" {
 }
 
 #include "spec/program.hpp"
+#include "tokenizer/tokens.hpp"
 
 
 class CtCodeGen {
 
 	CtImage mImage;
 
-public:
+	CtTokenStream mStream;
+	std::unique_ptr<CtProgram> mProgram = nullptr;
+
+	std::unordered_map<std::string, unsigned int> mJumpAddresses;
+	std::unordered_map<unsigned int, std::string> mPatches;
+	
+
+	std::unique_ptr<CtProcedure>
+	resolve_procedure();
 
 	void
-	generate(std::unique_ptr<CtProgram> program, std::string outpath);
+	parse_instruction();
 
+	
+	void
+	write_image(std::string outpath);
+
+
+	public:
+
+	void
+	generate(CtTokenStream stream, std::string outpath);
 };
 
 #endif // CUTEASM_CODEGEN_HPP

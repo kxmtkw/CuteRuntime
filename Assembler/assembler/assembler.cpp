@@ -6,7 +6,6 @@
 
 #include "tokenizer/tokenizer.hpp"
 #include "tokenizer/tokens.hpp"
-#include "resolver/resolver.hpp"
 #include "codegen/codegen.hpp"
 
 
@@ -44,9 +43,6 @@ void CtAssembler::assemble_string(std::string source, std::string outfile) {
 
 	stream.reset();
 
-	CtResolver resolver;
-	auto program = resolver.resolve(std::move(stream));
-
 	CtCodeGen generator;
-	generator.generate(std::move(program), outfile);
+	generator.generate(std::move(stream), outfile);
 }

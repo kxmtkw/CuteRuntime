@@ -60,7 +60,6 @@ CuteAsm.link(CuteInstr)
 CuteAsm.source = Source(
 	src / "tokenizer" / "tokenizer.cpp",
 	src / "tokenizer" / "stream.cpp",
-	src / "resolver" / "resolver.cpp",
 	src / "codegen" / "codegen.cpp",
 	src / "assembler" / "assembler.cpp"
 )
