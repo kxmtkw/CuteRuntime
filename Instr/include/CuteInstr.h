@@ -97,7 +97,7 @@ typedef enum {
 typedef uint8_t CtInstrSize;
 
 
-static const uint32_t ct_magic_id = 0x12345678; 
+static const uint32_t ct_magic_id = 0x63757465; 
 
 typedef struct {
 	uint32_t magic_id;
