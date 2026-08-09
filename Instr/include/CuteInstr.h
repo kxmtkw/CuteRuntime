@@ -120,6 +120,59 @@ typedef struct {
 } CtImage;
 
 
+typedef struct {
+	CtImage  image;
+	uint32_t procedure_cap;
+	uint32_t instruction_cap;
+} CtImageBuilder;
+
+
+// Intialize an empty image builder
+void
+ct_image_builder_init(CtImageBuilder* builder, uint32_t procedure_reserve, uint32_t instr_reserve);
+
+// Frees the image's resources
+void
+ct_image_builder_del(CtImageBuilder* builder);
+
+// Create a new procedure entry at the current instruction pool index.
+// The return number is the address of the procedure.
+uint32_t
+ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_count);
+
+// Get the current active address in the instruction pool.
+uint8_t*
+ct_image_builder_get_address(CtImageBuilder* builder);
+
+// Add an instruction to the pool
+void
+ct_image_builder_add_instr(CtImageBuilder* builder, CtInstrSize instr);
+
+// Add a u8 to the instruction pool
+void
+ct_image_builder_add_u8(CtImageBuilder* builder, uint8_t i);
+
+// Add a u16 to the instruction pool
+void
+ct_image_builder_add_u16(CtImageBuilder* builder, uint16_t i);
+
+// Add a u32 to the instruction pool
+void
+ct_image_builder_add_u32(CtImageBuilder* builder, uint32_t i);
+
+// Add a u64 to the instruction pool
+void
+ct_image_builder_add_u64(CtImageBuilder* builder, uint64_t i);
+
+// Add a f32 to the instruction pool
+void
+ct_image_builder_add_f32(CtImageBuilder* builder, float f);
+
+// Add a f64 to the instruction pool
+void
+ct_image_builder_add_f64(CtImageBuilder* builder, double f);
+
+
 typedef enum {
 	CT_IMAGE_STATUS_SUCCESS = 0x0,
 	CT_IMAGE_STATUS_FILE_NOT_FOUND = 0x1,
@@ -131,11 +184,11 @@ typedef enum {
 
 // Write an already initialized image to a file
 CtImageStatus
-ct_image_write(CtImage *img, const char *filepath);
+ct_image_dump(CtImage *img, const char *filepath);
 
 // Set an image from a file
 CtImageStatus
-ct_image_read(CtImage *img, const char *filepath);
+ct_image_load(CtImage *img, const char *filepath);
 
 // Free the image's resources.
 void 
