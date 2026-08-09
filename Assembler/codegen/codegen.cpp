@@ -1,6 +1,7 @@
 
 #include "codegen/codegen.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string.h>
 #include <string>
@@ -12,8 +13,8 @@ extern "C" {
 
 #include "tokenizer/tokens.hpp"
 #include "spec/instructions.hpp"
-#include "spec/program.hpp"
 
+using std::byte;
 
 static inline void
 add_bytes_to_vector(std::vector<byte>& vector, unsigned int size, void* src) {
@@ -26,35 +27,7 @@ add_bytes_to_vector(std::vector<byte>& vector, unsigned int size, void* src) {
 
 
 void
-CtCodeGen::write_image(std::string outpath) {
-
-	std::vector<CtImageProcedure> image_procedures(mProgram->procedures.size());
-
-	for (auto& proc: mProgram->procedures) {
-		
-		if (proc->id >= image_procedures.size()) {
-			image_procedures.resize(proc->id);
-		}
-
-		CtImageProcedure image_proc = {.bytecode_index = proc->address, .arg_count = proc->arg_count};
-		image_procedures[proc->id] = image_proc;
-	}
-
-	mImage.header.instruction_count = mProgram->instructions.size();
-	mImage.header.procedure_count = mProgram->procedures.size();
-
-	mImage.instruction_pool = (CtInstrSize*) mProgram->instructions.data();
-	mImage.procedure_table = image_procedures.data();
-	
-	ct_image_write(&mImage, outpath.data());
-}
-
-
-
-std::unique_ptr<CtProcedure>
 CtCodeGen::resolve_procedure() {
-
-	auto procedure = std::make_unique<CtProcedure>();
 
 	mJumpAddresses.clear();
 	mPatches.clear();
@@ -65,7 +38,7 @@ CtCodeGen::resolve_procedure() {
 		// invalid
 	}
 
-	procedure->id = std::stoul(val);
+	uint32_t id = std::stoul(val);
 
 	if (!(
 		mStream.expect_token("(") &&
@@ -75,8 +48,9 @@ CtCodeGen::resolve_procedure() {
 		// invalid
 	}
 
-	procedure->arg_count = std::stoul(val);
-	procedure->address = mProgram->instructions.size();
+	uint32_t arg_count = std::stoul(val);
+
+	ct_image_builder_new_proc(&mBuilder, id, arg_count);
 
 	if (!mStream.expect_token("{")) {
 		// invalid
@@ -92,14 +66,12 @@ CtCodeGen::resolve_procedure() {
 	}
 
 	for (auto item: mPatches) {
-		byte* ptr = mProgram->instructions.data() + item.first;
+		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
 		int jump_location = mJumpAddresses[item.second];
 		int current_location = item.first;
 		int offset = jump_location - current_location;
 		memcpy(ptr, &offset, sizeof(offset));
 	}
-
-	return procedure;
 }
 
 void
@@ -113,7 +85,7 @@ CtCodeGen::parse_instruction() {
 
 		mStream.expect_type(CtTokenType::Word, &label);
 
-		mJumpAddresses[label] = mProgram->instructions.size();
+		mJumpAddresses[label] = mBuilder.image.header.instruction_count;
 		
 		mStream.expect_token(";");
 
@@ -130,7 +102,7 @@ CtCodeGen::parse_instruction() {
 
 	CtInstrSize instr = CtInstrMap.at(val);
 
-	mProgram->instructions.push_back((byte)instr);
+	ct_image_builder_add_instr(&mBuilder, instr);
 	
 	while (!mStream.expect_token(";")) {
 
@@ -138,38 +110,34 @@ CtCodeGen::parse_instruction() {
 
 			mStream.expect_type(CtTokenType::Int, &val);
 			byte slot_index = (byte) std::stoi(val);
-			mProgram->instructions.push_back(slot_index);
+			ct_image_builder_add_u8(&mBuilder, (uint8_t) slot_index);
 
 		} else if (mStream.expect_type(CtTokenType::Int, &val)) {
 
 			int number = std::stoi(val);
-			add_bytes_to_vector(mProgram->instructions, 4, &number);
+			ct_image_builder_add_u32(&mBuilder, number);
 
 		} else if (mStream.expect_type(CtTokenType::Float, &val)) {
 			
 			float number = std::stof(val);
-			add_bytes_to_vector(mProgram->instructions, 4, &number);
+			ct_image_builder_add_f32(&mBuilder, number);
 
 		} else if (mStream.expect_type(CtTokenType::Word, &val)) {
 			
 			if (mJumpAddresses.contains(val)) {
 				
 				int jump_location = mJumpAddresses[val];
-				int current_location = mProgram->instructions.size() + 4;
+				int current_location = mBuilder.image.header.instruction_count + 4;
 				int offset = jump_location - current_location;
 
-				add_bytes_to_vector(mProgram->instructions, 4, &offset);
+				ct_image_builder_add_u32(&mBuilder, offset);
 
 			} else {
 
-				mPatches[mProgram->instructions.size()] = val;
-				int offset = 0;
-				add_bytes_to_vector(mProgram->instructions, 4, &offset);
-
+				mPatches[mBuilder.image.header.instruction_count] = val;
+				ct_image_builder_add_u32(&mBuilder, 0);
 			}
-
 		}
-
 	}
 }
 
@@ -178,18 +146,16 @@ void
 CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 
 	mStream = stream;
-	mProgram = std::make_unique<CtProgram>();
+
+	ct_image_builder_init(&mBuilder, 16, 64);
 
 	while (!mStream.eof()) {
 		
 		if (mStream.expect_token("proc")) {
-
-			auto procedure = resolve_procedure();
-			mProgram->procedures.push_back(std::move(procedure));
-
+			resolve_procedure();
 		}
 	}
 
-	write_image(outpath);
+	ct_image_dump(&mBuilder.image, outpath.data());
 }
 

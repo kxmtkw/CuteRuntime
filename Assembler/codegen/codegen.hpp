@@ -2,38 +2,30 @@
 #ifndef CUTEASM_CODEGEN_HPP
 #define CUTEASM_CODEGEN_HPP
 
-#include <map>
-#include <vector>
+#include <cstdint>
+#include <unordered_map>
 
 extern "C" {
 	#include "CuteInstr.h"
 }
 
-#include "spec/program.hpp"
 #include "tokenizer/tokens.hpp"
 
 
 class CtCodeGen {
 
-	CtImage mImage;
+	CtImageBuilder mBuilder;
 
 	CtTokenStream mStream;
-	std::unique_ptr<CtProgram> mProgram = nullptr;
 
-	std::unordered_map<std::string, unsigned int> mJumpAddresses;
-	std::unordered_map<unsigned int, std::string> mPatches;
+	std::unordered_map<std::string, uint32_t> mJumpAddresses;
+	std::unordered_map<uint32_t, std::string> mPatches;
 	
-
-	std::unique_ptr<CtProcedure>
+	void
 	resolve_procedure();
 
 	void
 	parse_instruction();
-
-	
-	void
-	write_image(std::string outpath);
-
 
 	public:
 
