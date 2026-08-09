@@ -2,6 +2,7 @@
 #include "codegen/codegen.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <string.h>
 #include <string>
@@ -16,15 +17,6 @@ extern "C" {
 
 using std::byte;
 
-static inline void
-add_bytes_to_vector(std::vector<byte>& vector, unsigned int size, void* src) {
-	size_t old_size = vector.size();
-	vector.resize(vector.size() + size);
-	byte* ptr = vector.data() + old_size;
-	memcpy(ptr, src, size);
-}
-
-
 
 void
 CtCodeGen::resolve_procedure() {
@@ -35,7 +27,8 @@ CtCodeGen::resolve_procedure() {
 	std::string val;
 
 	if (!mStream.expect_type(CtTokenType::Int, &val)) {
-		// invalid
+		std::cerr << "Expected integar for procedure id. Got: " << val << "\n";
+		exit(1);
 	}
 
 	uint32_t id = std::stoul(val);
@@ -45,7 +38,8 @@ CtCodeGen::resolve_procedure() {
 		mStream.expect_type(CtTokenType::Int, &val) &&
 		mStream.expect_token(")")
 	)) {
-		// invalid
+		std::cerr << "Invalid argument formag for procedure " << id << ". Got: " << val << "\n";
+		exit(1);
 	}
 
 	uint32_t arg_count = std::stoul(val);
@@ -53,10 +47,16 @@ CtCodeGen::resolve_procedure() {
 	ct_image_builder_new_proc(&mBuilder, id, arg_count);
 
 	if (!mStream.expect_token("{")) {
-		// invalid
+		std::cerr << "Expected { after procedure declaration." << "\n";
+		exit(1);
 	}
 
-	while (!mStream.eof()) {
+	while (true) {
+
+		if (mStream.eof()) {
+			std::cerr << "Procedure did not end with }. File ended too soon." << "\n";
+			exit(1);
+		}
 
 		if (mStream.expect_token("}")) {
 			break;
@@ -97,7 +97,8 @@ CtCodeGen::parse_instruction() {
 	}
 	
 	if (!CtInstrMap.contains(val)) {
-		// error
+		std::cerr << "Unknown instruction: " << val << "\n";
+		exit(1);
 	}
 
 	CtInstrSize instr = CtInstrMap.at(val);
