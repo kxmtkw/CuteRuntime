@@ -142,7 +142,11 @@ ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_cou
 
 // Get the current active address in the instruction pool.
 uint8_t*
-ct_image_builder_get_address(CtImageBuilder* builder);
+ct_image_builder_current_address(CtImageBuilder* builder);
+
+// Get the address of a specific byte offset in the pool.
+uint8_t*
+ct_image_builder_get_address(CtImageBuilder* builder, uint32_t index);
 
 // Add an instruction to the pool
 void

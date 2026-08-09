@@ -93,13 +93,25 @@ ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_cou
 }
 
 
-uint8_t* 
-ct_image_builder_get_address(CtImageBuilder* builder) {
+uint8_t*
+ct_image_builder_current_address(CtImageBuilder* builder) {
 	if (!builder || !builder->image.instruction_pool) {
 		return NULL;
 	}
 	return builder->image.instruction_pool + builder->image.header.instruction_count;
 }
+
+
+uint8_t*
+ct_image_builder_get_address(CtImageBuilder* builder, uint32_t index) {
+	{
+		if (!builder || !builder->image.instruction_pool || index >= builder->image.header.instruction_count) {
+			return NULL;
+		}
+		return &builder->image.instruction_pool[index];
+	}
+}
+
 
 
 void 
