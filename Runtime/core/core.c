@@ -42,7 +42,7 @@ ct_runtime_load(CtRuntime* runtime, const char* filepath) {
 	
 	CT_LOG("runtime", "Loading image file: %s\n", filepath);
 
-	CtImageStatus code = ct_image_read(&runtime->image, filepath);
+	CtImageStatus code = ct_image_load(&runtime->image, filepath);
 
 	switch (code) {
 
