@@ -50,6 +50,11 @@ void CtAssembler::assemble_string(std::string source, std::string outfile) {
 
 	stream.reset();
 
-	CtCodeGen generator;
+	CtCodeGen generator(error);
 	generator.generate(std::move(stream), outfile);
+
+	if (error.has_error()) {
+		error.print();
+		exit(1);
+	}
 }

@@ -56,6 +56,9 @@ class CtTokenStream {
 
 public:
 
+	const std::string&
+	get_source() {return mSource;}
+
 	// get the next token
 	CtToken next();
 	// take a look at the next token

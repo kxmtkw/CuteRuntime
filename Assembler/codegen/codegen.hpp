@@ -11,9 +11,12 @@ extern "C" {
 }
 
 #include "tokenizer/tokens.hpp"
+#include "utils/utils.hpp"
 
 
 class CtCodeGen {
+
+	CtUtils::ErrorCollector& mError;
 
 	CtImageBuilder mBuilder;
 
@@ -46,7 +49,12 @@ class CtCodeGen {
 	void
 	resolve_jumps();
 
+	void
+	throw_error(std::string details);
+
 	public:
+
+	CtCodeGen(CtUtils::ErrorCollector& err): mError(err) {};
 
 	void
 	generate(CtTokenStream stream, std::string outpath);

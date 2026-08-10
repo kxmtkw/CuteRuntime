@@ -1,7 +1,9 @@
 
 #include "codegen/codegen.hpp"
+#include "utils/utils.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <format>
 #include <iostream>
 #include <memory>
 #include <string.h>
@@ -27,15 +29,15 @@ CtCodeGen::parse_procedure() {
 	std::string val;
 
 	if (!mStream.expect_type(CtTokenType::Int, &val)) {
-		std::cerr << "Expected integar for procedure id. Got: " << val << "\n";
-		exit(1);
+		throw_error("Expected integar for procedure id.");
+		return;
 	}
 
 	uint32_t id = std::stoul(val);
 
 	if (!(mStream.expect_token(":") &&mStream.expect_type(CtTokenType::Int, &val))) {
-		std::cerr << "Invalid argument format for procedure " << id << ". Got: " << val << "\n";
-		exit(1);
+		throw_error("Invalid argument format.");
+		return;
 	}
 
 	uint32_t arg_count = std::stoul(val);
@@ -43,14 +45,15 @@ CtCodeGen::parse_procedure() {
 	ct_image_builder_new_proc(&mBuilder, id, arg_count);
 
 	if (!mStream.expect_token("{")) {
-		std::cerr << "Expected { after procedure declaration." << "\n";
-		exit(1);
+		throw_error("Expected { after procedure declaration.");
+		return;
 	}
 
 	while (true) {
 
 		if (mStream.eof()) {
-			std::cerr << "Procedure did not end with }. File ended too soon." << "\n";
+			throw_error("Procedure did not end with }. File ended too soon.");
+			return;
 			exit(1);
 		}
 
@@ -96,12 +99,12 @@ CtCodeGen::parse_instruction() {
 	std::string val;
 
 	if (!mStream.expect_type(CtTokenType::Word, &val)) {
-		
+		throw_error(std::format("Expected Word."));
 	}
 	
 	if (!CtInstrMap.contains(val)) {
-		std::cerr << "Unknown instruction: " << val << "\n";
-		exit(1);
+		throw_error(std::format("Unknown Instruction: {}", val));
+		return;
 	}
 
 	CtInstrSize instr = CtInstrMap.at(val);
@@ -145,6 +148,12 @@ void
 CtCodeGen::resolve_jumps() {
 	for (auto item: mPatches) {
 		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
+
+		if (!mJumpAddresses.contains(item.second)) {
+			throw_error("Unknown Word.");
+			return;
+		}
+
 		int jump_location = mJumpAddresses[item.second];
 		int current_location = item.first;
 		int offset = jump_location - current_location;
@@ -152,6 +161,17 @@ CtCodeGen::resolve_jumps() {
 	}
 }
 
+void
+CtCodeGen::throw_error(std::string details) {
+	unsigned int index = mStream.peek().start;
+	mError.add_error(
+		CtUtils::count_lines_up_to_index(mStream.get_source(), index), 
+		CtUtils::get_line_at_index(mStream.get_source(), index), 
+		details
+	);
+	mError.print();
+	exit(1);
+}
 
 void
 CtCodeGen::generate(CtTokenStream stream, std::string outpath) {

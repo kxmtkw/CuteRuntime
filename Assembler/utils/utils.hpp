@@ -22,9 +22,9 @@ namespace CtUtils {
 		has_error() {return mHasError;}
 
 		void
-		add_error(int line_num,std::string_view line, std::string details) {
+		add_error(int line_num, std::string_view line, std::string details) {
 			std::string error = std::format(
-				"Line: {}\n|{}\n>> {}\n", line_num, line, details
+				"[ERROR] {}\nLine: {}\n{}\n", details, line_num, line
 			);
 			mHasError = true;
 			mErrorStrings.push_back(error);
