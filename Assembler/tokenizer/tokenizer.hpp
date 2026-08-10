@@ -54,6 +54,8 @@ class CtTokenizer {
 	void tokenize_slot();
 
 
+	void throw_error(std::string details);
+
 public:
 
 	CtTokenizer(CtErrorCollector& err): mError(err) {};

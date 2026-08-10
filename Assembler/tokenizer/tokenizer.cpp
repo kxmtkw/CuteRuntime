@@ -88,11 +88,7 @@ void CtTokenizer::tokenize_number() {
 		if (c == '.') {
 
 			if (is_float) {
-				mError.add_error(
-					ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-					ct_utils_get_line_at_index(mSource, mCurrent), 
-					"Illegal Token."
-				);
+				throw_error("Illegal symbol.");
 				return;
 			}
 
@@ -103,11 +99,7 @@ void CtTokenizer::tokenize_number() {
 
 
 		if (std::isalpha(c)) {
-			mError.add_error(
-				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-				ct_utils_get_line_at_index(mSource, mCurrent), 
-				"Illegal Token."
-			);
+			throw_error("Did not expect alphabetic character.");
 			return;
 		}
 		
@@ -128,11 +120,7 @@ void CtTokenizer::tokenize_char() {
 	c = next();
 	
 	if (c != '\'') {
-		mError.add_error(
-			ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-			ct_utils_get_line_at_index(mSource, mCurrent), 
-			"Illegal Token."
-		);
+		throw_error("Unterminated char or Too long char.");
 		return;
 	}
 
@@ -153,11 +141,7 @@ void CtTokenizer::tokenize_string() {
 		c = next();
 
 		if (eof()) {
-			mError.add_error(
-				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-				ct_utils_get_line_at_index(mSource, mCurrent), 
-				"Illegal Token."
-			);
+			throw_error("Unterminated string.");
 			return;
 		}
 
@@ -197,11 +181,7 @@ void CtTokenizer::tokenize_slot() {
 		}
 		
 		if (std::isalpha(c)) {
-			mError.add_error(
-				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-				ct_utils_get_line_at_index(mSource, mCurrent), 
-				"Illegal Token."
-			);
+			throw_error("Illegal alphabetic character.");
 			return;
 		}
 
@@ -209,17 +189,21 @@ void CtTokenizer::tokenize_slot() {
 	}
 
 	if (start == mCurrent) {
-		mError.add_error(
-			ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-			ct_utils_get_line_at_index(mSource, mCurrent), 
-			"Illegal Token."
-		);
+		throw_error("Empty Slot.");
 		return;
 	}
 
 	mTokens.emplace_back(CtToken(CtTokenType::Slot, start, mCurrent-start));
 }
 
+
+void CtTokenizer::throw_error(std::string details) {
+	mError.add_error(
+		ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+		ct_utils_get_line_at_index(mSource, mCurrent), 
+		details
+	);
+}
 
 
 CtTokenStream CtTokenizer::tokenize(std::string source) {
