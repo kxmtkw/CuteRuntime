@@ -43,13 +43,6 @@ void CtAssembler::assemble_string(std::string source, std::string outfile) {
 		exit(1);
 	}
 
-	while (stream.peek().type != CtTokenType::EndOfFile) {
-		CtToken token = stream.next();
-		std::cout << _ct_token_to_string(token.type) << " " << stream.get_value(token) << std::endl;
-	}
-
-	stream.reset();
-
 	CtCodeGen generator(error);
 	generator.generate(std::move(stream), outfile);
 
