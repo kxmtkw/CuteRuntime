@@ -49,7 +49,6 @@ target_link_libraries(cute PRIVATE CuteRuntime)
 add_library(CuteAsm STATIC
     Assembler/tokenizer/tokenizer.cpp
     Assembler/tokenizer/stream.cpp
-	Assembler/resolver/resolver.cpp
 	Assembler/codegen/codegen.cpp
     Assembler/assembler/assembler.cpp
 )
