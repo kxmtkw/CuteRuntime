@@ -19,9 +19,11 @@ static const std::map<std::string, CtInstr> CtInstrMap = {
 
 	{"mov",         CT_INSTR_MOV},
 
-	{"seti",        CT_INSTR_SETI},
-	{"setu",        CT_INSTR_SETU},
-	{"setf",        CT_INSTR_SETF},
+	{"loadi16",     CT_INSTR_LOAD_I16},
+	{"loadi32",     CT_INSTR_LOAD_I32},
+	{"loadi64",     CT_INSTR_LOAD_I64},
+	{"loadf32",     CT_INSTR_LOAD_F32},
+	{"loadf64",     CT_INSTR_LOAD_F64},
 
 	{"i2f",         CT_INSTR_CAST_I2F},
 	{"f2i",         CT_INSTR_CAST_F2I},
@@ -35,16 +37,12 @@ static const std::map<std::string, CtInstr> CtInstrMap = {
 	{"modi",        CT_INSTR_MODI},
 	{"negi",        CT_INSTR_NEGI},
 	{"absi",        CT_INSTR_ABSI},
-	{"inci",        CT_INSTR_INCI},
-	{"deci",        CT_INSTR_DECI},
 
-	{"addu",        CT_INSTR_ADDU},
-	{"subu",        CT_INSTR_SUBU},
-	{"mulu",        CT_INSTR_MULU},
 	{"divu",        CT_INSTR_DIVU},
 	{"modu",        CT_INSTR_MODU},
-	{"incu",        CT_INSTR_INCU},
-	{"decu",        CT_INSTR_DECU},
+
+	{"inc",        CT_INSTR_INC},
+	{"dec",        CT_INSTR_DEC},
 
 	{"addf",        CT_INSTR_ADDF},
 	{"subf",        CT_INSTR_SUBF},

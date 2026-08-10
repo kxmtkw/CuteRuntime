@@ -12,9 +12,12 @@ typedef enum {
     CT_INSTR_OUT          = 0x02,
     
     CT_INSTR_MOV          = 0x20,
-    CT_INSTR_SETI         = 0x21,
-    CT_INSTR_SETU         = 0x22,
-    CT_INSTR_SETF         = 0x23,
+
+	CT_INSTR_LOAD_I16      = 0x21,
+    CT_INSTR_LOAD_I32      = 0x22,
+    CT_INSTR_LOAD_I64      = 0x23,
+    CT_INSTR_LOAD_F32      = 0x24,
+	CT_INSTR_LOAD_F64      = 0x25,
 
     CT_INSTR_CAST_I2F     = 0x2A,
     CT_INSTR_CAST_F2I     = 0x2B,
@@ -28,16 +31,12 @@ typedef enum {
     CT_INSTR_MODI         = 0x34,
     CT_INSTR_NEGI         = 0x35,
     CT_INSTR_ABSI         = 0x36,
-    CT_INSTR_INCI         = 0x37,
-    CT_INSTR_DECI         = 0x38,
 
-    CT_INSTR_ADDU         = 0x40,
-    CT_INSTR_SUBU         = 0x41,
-    CT_INSTR_MULU         = 0x42,
-    CT_INSTR_DIVU         = 0x43,
-    CT_INSTR_MODU         = 0x44,
-    CT_INSTR_INCU         = 0x45,
-    CT_INSTR_DECU         = 0x46,
+	CT_INSTR_DIVU         = 0x37,
+    CT_INSTR_MODU         = 0x38,
+
+	CT_INSTR_INC          = 0x3A,
+    CT_INSTR_DEC          = 0x3B,
 
     CT_INSTR_ADDF         = 0x50,
     CT_INSTR_SUBF         = 0x51,
