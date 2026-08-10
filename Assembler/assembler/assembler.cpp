@@ -8,6 +8,7 @@
 #include "tokenizer/tokens.hpp"
 #include "codegen/codegen.hpp"
 
+#include "spec/error.hpp"
 
 #include "CuteAsm.hpp"
 
@@ -32,9 +33,15 @@ void CtAssembler::assemble(std::string filepath) {
 
 void CtAssembler::assemble_string(std::string source, std::string outfile) {
 
-	CtTokenizer tokenizer;
+	CtErrorCollector error;
+	CtTokenizer tokenizer(error);
 
 	auto stream = tokenizer.tokenize(std::move(source));
+
+	if (error.has_error()) {
+		error.print();
+		exit(1);
+	}
 
 	while (stream.peek().type != CtTokenType::EndOfFile) {
 		CtToken token = stream.next();

@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "spec/utils.hpp"
+
 #include "tokens.hpp"
 #include "tokenizer.hpp"
 
@@ -86,7 +88,12 @@ void CtTokenizer::tokenize_number() {
 		if (c == '.') {
 
 			if (is_float) {
-				// invalid
+				mError.add_error(
+					ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+					ct_utils_get_line_at_index(mSource, mCurrent), 
+					"Illegal Token."
+				);
+				return;
 			}
 
 			is_float = true;
@@ -96,11 +103,15 @@ void CtTokenizer::tokenize_number() {
 
 
 		if (std::isalpha(c)) {
-			// illegal
+			mError.add_error(
+				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+				ct_utils_get_line_at_index(mSource, mCurrent), 
+				"Illegal Token."
+			);
+			return;
 		}
 		
 		break;
-		// error, illegal token sequence
 	}
 
 	mTokens.emplace_back(CtToken(is_float ? CtTokenType::Float: CtTokenType::Int, start, mCurrent-start));
@@ -109,19 +120,20 @@ void CtTokenizer::tokenize_number() {
 
 void CtTokenizer::tokenize_char() {
 
-	char c = next();
-	
-	if (c != '\'') {
-		// error
-	}
+	char c = next(); // consume the '
 
 	uint start = mCurrent;
-	next();
+	next(); // consume the char
 
 	c = next();
 	
 	if (c != '\'') {
-		// error
+		mError.add_error(
+			ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+			ct_utils_get_line_at_index(mSource, mCurrent), 
+			"Illegal Token."
+		);
+		return;
 	}
 
 	mTokens.emplace_back(CtToken(CtTokenType::Char, start, 1));
@@ -129,11 +141,8 @@ void CtTokenizer::tokenize_char() {
 
 
 void CtTokenizer::tokenize_string() {
-	char c = next();
-	
-	if (c != '\"') {
-		// error
-	}
+
+	char c = next(); // consume the "
 
 	uint start = mCurrent;
 
@@ -144,7 +153,12 @@ void CtTokenizer::tokenize_string() {
 		c = next();
 
 		if (eof()) {
-			// unterminated string
+			mError.add_error(
+				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+				ct_utils_get_line_at_index(mSource, mCurrent), 
+				"Illegal Token."
+			);
+			return;
 		}
 
 		if (c == '\\') {
@@ -165,7 +179,7 @@ void CtTokenizer::tokenize_symbol() {
 void CtTokenizer::tokenize_slot() {
 
 	next(); // consume the the $
-	
+
 	uint start = mCurrent;
 	char c;
 
@@ -182,12 +196,25 @@ void CtTokenizer::tokenize_slot() {
 			break;
 		}
 		
+		if (std::isalpha(c)) {
+			mError.add_error(
+				ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+				ct_utils_get_line_at_index(mSource, mCurrent), 
+				"Illegal Token."
+			);
+			return;
+		}
+
 		break;
-		// error, illegal token sequence
 	}
 
 	if (start == mCurrent) {
-		// slot is empty
+		mError.add_error(
+			ct_utils_count_lines_up_to_index(mSource, mCurrent), 
+			ct_utils_get_line_at_index(mSource, mCurrent), 
+			"Illegal Token."
+		);
+		return;
 	}
 
 	mTokens.emplace_back(CtToken(CtTokenType::Slot, start, mCurrent-start));

@@ -6,11 +6,13 @@
 #include <string>
 #include <vector>
 
+#include "spec/error.hpp"
 #include "tokens.hpp"
 
 
 class CtTokenizer {
 
+	CtErrorCollector& mError;
 	std::string mSource;
 	std::vector<CtToken> mTokens;
 	uint mCurrent;
@@ -34,7 +36,7 @@ class CtTokenizer {
 	bool is_whitespace(char c) {
 		return c == ' ' or c == '\t' or c == '\n';
 	};
-	
+
 	// read until new line
 	void read_comment();
 
@@ -53,6 +55,8 @@ class CtTokenizer {
 
 
 public:
+
+	CtTokenizer(CtErrorCollector& err): mError(err) {};
 
 	// tokenize a string and return CtTokenStream object.
 	CtTokenStream tokenize(std::string source);

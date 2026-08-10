@@ -4,8 +4,9 @@
 
 #include <string>
 
-class CtAssembler {
 
+class CtAssembler {
+  
 	void assemble_string(std::string source, std::string outfile);
 
 	public:
