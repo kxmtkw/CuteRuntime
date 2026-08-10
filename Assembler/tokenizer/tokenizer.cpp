@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "spec/utils.hpp"
+#include "utils/utils.hpp"
 
 #include "tokens.hpp"
 #include "tokenizer.hpp"
@@ -199,8 +199,8 @@ void CtTokenizer::tokenize_slot() {
 
 void CtTokenizer::throw_error(std::string details) {
 	mError.add_error(
-		ct_utils_count_lines_up_to_index(mSource, mCurrent), 
-		ct_utils_get_line_at_index(mSource, mCurrent), 
+		CtUtils::count_lines_up_to_index(mSource, mCurrent), 
+		CtUtils::get_line_at_index(mSource, mCurrent), 
 		details
 	);
 }

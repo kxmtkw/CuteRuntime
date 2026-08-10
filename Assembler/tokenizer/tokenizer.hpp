@@ -6,13 +6,13 @@
 #include <string>
 #include <vector>
 
-#include "spec/error.hpp"
+#include "utils/utils.hpp"
 #include "tokens.hpp"
 
 
 class CtTokenizer {
 
-	CtErrorCollector& mError;
+	CtUtils::ErrorCollector& mError;
 	std::string mSource;
 	std::vector<CtToken> mTokens;
 	uint mCurrent;
@@ -58,7 +58,7 @@ class CtTokenizer {
 
 public:
 
-	CtTokenizer(CtErrorCollector& err): mError(err) {};
+	CtTokenizer(CtUtils::ErrorCollector& err): mError(err) {};
 
 	// tokenize a string and return CtTokenStream object.
 	CtTokenStream tokenize(std::string source);
