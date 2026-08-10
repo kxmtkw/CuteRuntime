@@ -61,6 +61,7 @@ CtCodeGen::parse_procedure() {
 		parse_procedure_statement();
 	}
 
+	resolve_jumps();
 }
 
 
