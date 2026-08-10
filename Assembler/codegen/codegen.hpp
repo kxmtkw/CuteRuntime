@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <vector>
 
 extern "C" {
 	#include "CuteInstr.h"
@@ -20,12 +21,30 @@ class CtCodeGen {
 
 	std::unordered_map<std::string, uint32_t> mJumpAddresses;
 	std::unordered_map<uint32_t, std::string> mPatches;
-	
-	void
-	resolve_procedure();
 
+	// Parse a procedure
+	void
+	parse_procedure();
+
+	// Parse a procedure statement
+	void
+	parse_procedure_statement();
+
+	// Parse a label
+	void
+	parse_label();
+
+	// Parse an instruction
 	void
 	parse_instruction();
+
+	// Parse an expression inside an instruction
+	void
+	parse_expression();
+
+	// Resolve all jump offsets.
+	void
+	resolve_jumps();
 
 	public:
 

@@ -19,7 +19,7 @@ using std::byte;
 
 
 void
-CtCodeGen::resolve_procedure() {
+CtCodeGen::parse_procedure() {
 
 	mJumpAddresses.clear();
 	mPatches.clear();
@@ -33,12 +33,8 @@ CtCodeGen::resolve_procedure() {
 
 	uint32_t id = std::stoul(val);
 
-	if (!(
-		mStream.expect_token("(") &&
-		mStream.expect_type(CtTokenType::Int, &val) &&
-		mStream.expect_token(")")
-	)) {
-		std::cerr << "Invalid argument formag for procedure " << id << ". Got: " << val << "\n";
+	if (!(mStream.expect_token(":") &&mStream.expect_type(CtTokenType::Int, &val))) {
+		std::cerr << "Invalid argument format for procedure " << id << ". Got: " << val << "\n";
 		exit(1);
 	}
 
@@ -62,35 +58,41 @@ CtCodeGen::resolve_procedure() {
 			break;
 		}
 	
-		parse_instruction();
+		parse_procedure_statement();
 	}
 
-	for (auto item: mPatches) {
-		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
-		int jump_location = mJumpAddresses[item.second];
-		int current_location = item.first;
-		int offset = jump_location - current_location;
-		memcpy(ptr, &offset, sizeof(offset));
+}
+
+
+void
+CtCodeGen::parse_procedure_statement() {
+
+	if (mStream.expect_token("@")) {
+		parse_label();		
+	} else {
+		parse_instruction();
 	}
 }
+
+
+void
+CtCodeGen::parse_label() {
+	std::string label;
+
+	mStream.expect_type(CtTokenType::Word, &label);
+
+	mJumpAddresses[label] = mBuilder.image.header.instruction_count;
+	
+	mStream.expect_token(";");
+
+	return;
+}
+
 
 void
 CtCodeGen::parse_instruction() {
 
 	std::string val;
-
-	if (mStream.expect_token("@")) {
-
-		std::string label;
-
-		mStream.expect_type(CtTokenType::Word, &label);
-
-		mJumpAddresses[label] = mBuilder.image.header.instruction_count;
-		
-		mStream.expect_token(";");
-
-		return;
-	}
 
 	if (!mStream.expect_type(CtTokenType::Word, &val)) {
 		
@@ -106,39 +108,47 @@ CtCodeGen::parse_instruction() {
 	ct_image_builder_add_instr(&mBuilder, instr);
 	
 	while (!mStream.expect_token(";")) {
+		parse_expression();
+	}
+}
 
-		if (mStream.expect_token("$")) {
 
-			mStream.expect_type(CtTokenType::Int, &val);
-			byte slot_index = (byte) std::stoi(val);
-			ct_image_builder_add_u8(&mBuilder, (uint8_t) slot_index);
+void
+CtCodeGen::parse_expression() {
 
-		} else if (mStream.expect_type(CtTokenType::Int, &val)) {
+	std::string val;
 
-			int number = std::stoi(val);
-			ct_image_builder_add_u32(&mBuilder, number);
+	if (mStream.expect_token("$")) {
 
-		} else if (mStream.expect_type(CtTokenType::Float, &val)) {
-			
-			float number = std::stof(val);
-			ct_image_builder_add_f32(&mBuilder, number);
+		mStream.expect_type(CtTokenType::Int, &val);
+		byte slot_index = (byte) std::stoi(val);
+		ct_image_builder_add_u8(&mBuilder, (uint8_t) slot_index);
 
-		} else if (mStream.expect_type(CtTokenType::Word, &val)) {
-			
-			if (mJumpAddresses.contains(val)) {
-				
-				int jump_location = mJumpAddresses[val];
-				int current_location = mBuilder.image.header.instruction_count + 4;
-				int offset = jump_location - current_location;
+	} else if (mStream.expect_type(CtTokenType::Int, &val)) {
 
-				ct_image_builder_add_u32(&mBuilder, offset);
+		int number = std::stoi(val);
+		ct_image_builder_add_u32(&mBuilder, number);
 
-			} else {
+	} else if (mStream.expect_type(CtTokenType::Float, &val)) {
+		
+		float number = std::stof(val);
+		ct_image_builder_add_f32(&mBuilder, number);
 
-				mPatches[mBuilder.image.header.instruction_count] = val;
-				ct_image_builder_add_u32(&mBuilder, 0);
-			}
-		}
+	} else if (mStream.expect_type(CtTokenType::Word, &val)) {
+		mPatches[mBuilder.image.header.instruction_count] = val;
+		ct_image_builder_add_u32(&mBuilder, 0);
+	}
+}
+
+
+void
+CtCodeGen::resolve_jumps() {
+	for (auto item: mPatches) {
+		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
+		int jump_location = mJumpAddresses[item.second];
+		int current_location = item.first;
+		int offset = jump_location - current_location;
+		memcpy(ptr, &offset, sizeof(offset));
 	}
 }
 
@@ -153,7 +163,7 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 	while (!mStream.eof()) {
 		
 		if (mStream.expect_token("proc")) {
-			resolve_procedure();
+			parse_procedure();
 		}
 	}
 
