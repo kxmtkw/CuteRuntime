@@ -30,6 +30,11 @@ class CtTokenizer {
 	// eat all spaces, new lines, tabs until there is none.
 	void eat_whitspace();
 
+	// check if a character counts as whitespace
+	bool is_whitespace(char c) {
+		return c == ' ' or c == '\t' or c == '\n';
+	};
+	
 	// read until new line
 	void read_comment();
 
@@ -43,6 +48,8 @@ class CtTokenizer {
 	void tokenize_string();
 	// tokenize a char, should use '', and only a single is allowed as usual
 	void tokenize_char();
+	// tokenize a slot
+	void tokenize_slot();
 
 
 public:

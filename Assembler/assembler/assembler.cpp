@@ -38,7 +38,7 @@ void CtAssembler::assemble_string(std::string source, std::string outfile) {
 
 	while (stream.peek().type != CtTokenType::EndOfFile) {
 		CtToken token = stream.next();
-		std::cout << stream.get_value(token) << std::endl;
+		std::cout << _ct_token_to_string(token.type) << " " << stream.get_value(token) << std::endl;
 	}
 
 	stream.reset();

@@ -119,9 +119,8 @@ CtCodeGen::parse_expression() {
 
 	std::string val;
 
-	if (mStream.expect_token("$")) {
-
-		mStream.expect_type(CtTokenType::Int, &val);
+	if (mStream.expect_type(CtTokenType::Slot, &val)) {
+		
 		byte slot_index = (byte) std::stoi(val);
 		ct_image_builder_add_u8(&mBuilder, (uint8_t) slot_index);
 

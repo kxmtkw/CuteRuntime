@@ -162,6 +162,38 @@ void CtTokenizer::tokenize_symbol() {
 }
 
 
+void CtTokenizer::tokenize_slot() {
+
+	next(); // consume the the $
+	
+	uint start = mCurrent;
+	char c;
+
+	while (!eof()) {
+
+		c = peek();
+
+		if (std::isdigit(c)) {
+			next();
+			continue;
+		}
+
+		if (is_whitespace(c)) {
+			break;
+		}
+		
+		break;
+		// error, illegal token sequence
+	}
+
+	if (start == mCurrent) {
+		// slot is empty
+	}
+
+	mTokens.emplace_back(CtToken(CtTokenType::Slot, start, mCurrent-start));
+}
+
+
 
 CtTokenStream CtTokenizer::tokenize(std::string source) {
 
@@ -186,6 +218,9 @@ CtTokenStream CtTokenizer::tokenize(std::string source) {
 		}
 		else if (c == '#') {
 			read_comment();
+		}
+		else if (c == '$') {
+			tokenize_slot();
 		}
 		else if (c == '\'') {
 			tokenize_char();

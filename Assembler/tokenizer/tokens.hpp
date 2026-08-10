@@ -14,7 +14,8 @@ enum class CtTokenType {
 	Float,
 	String,
 	Char,
-	Symbol
+	Symbol,
+	Slot
 };
 
 struct CtToken {
@@ -29,7 +30,7 @@ struct CtToken {
 
 
 static inline std::string 
-CtTokenTypeString(CtTokenType type) {
+_ct_token_to_string(CtTokenType type) {
     switch (type) {
         case CtTokenType::EndOfFile: return "EndOfFile";
         case CtTokenType::Word:      return "Word";
@@ -38,6 +39,7 @@ CtTokenTypeString(CtTokenType type) {
         case CtTokenType::String:    return "String";
 		case CtTokenType::Char:      return "Char";
         case CtTokenType::Symbol:    return "Symbol";
+		case CtTokenType::Slot:      return "Slot";
         default:                     return "Unknown";
     }
 }
