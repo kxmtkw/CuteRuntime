@@ -155,7 +155,7 @@ CtCodeGen::resolve_jumps() {
 		}
 
 		int jump_location = mJumpAddresses[item.second];
-		int current_location = item.first;
+		int current_location = item.first + 4;
 		int offset = jump_location - current_location;
 		memcpy(ptr, &offset, sizeof(offset));
 	}
