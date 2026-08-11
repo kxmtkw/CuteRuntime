@@ -157,13 +157,23 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int16.");
 		}
-		int16_t number = static_cast<int16_t>(std::stoi(val));
+
+		int16_t number;
+
+		if (!CtUtils::str_to_i16(val, number)) {
+			throw_error("Number too large to fit inside int16.");
+		}
+
 		ct_image_builder_add_u16(&mBuilder, static_cast<uint16_t>(number));
 	} 
 
 	else if (optype == CtInstrOperandType::I32) {
 		if (mStream.expect_type(CtTokenType::Int, &val)) {
-			int32_t number = std::stoi(val);
+			int32_t number;
+
+			if (!CtUtils::str_to_i32(val, number)) {
+				throw_error("Number too large to fit inside int32.");
+			}
 			ct_image_builder_add_u32(&mBuilder, static_cast<uint32_t>(number));
 			return;
 
@@ -180,7 +190,11 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int64.");
 		}
-		int64_t number = std::stoll(val);
+		int64_t number;
+
+		if (!CtUtils::str_to_i64(val, number)) {
+			throw_error("Number too large to fit inside int64.");
+		}
 		ct_image_builder_add_u64(&mBuilder, static_cast<uint64_t>(number));
 	} 
 
@@ -188,7 +202,12 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 		if (!mStream.expect_type(CtTokenType::Float, &val)) {
 			throw_error("Expected float32.");
 		}
-		float number = std::stof(val);
+		float number;
+
+		if (!CtUtils::str_to_f32(val, number)) {
+			throw_error("Number too large to fit inside float32.");
+		}
+
 		ct_image_builder_add_f32(&mBuilder, number);
 	} 
 
@@ -196,7 +215,11 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 		if (!mStream.expect_type(CtTokenType::Float, &val)) {
 			throw_error("Expected float64");
 		}
-		double number = std::stod(val);
+		double number;
+
+		if (!CtUtils::str_to_f64(val, number)) {
+			throw_error("Number too large to fit inside float64.");
+		}
 		ct_image_builder_add_f64(&mBuilder, number);
 	} 
 }

@@ -1,8 +1,11 @@
 #ifndef CUTEASM_UTILS_HPP
 #define CUTEASM_UTILS_HPP
 
+#include <cstdint>
 #include <format>
 #include <iostream>
+#include <stdexcept>
+#include <string>
 #include <string_view>
 #include <sstream>
 
@@ -56,6 +59,90 @@ namespace CtUtils {
 		std::cout << std::format("[Error] {}\nLine: {} Col: {}\n{}\n", details, line, col, line_str);
 		exit(1);
 	};
+
+	static bool 
+	str_to_i16(const std::string& str, int16_t& i) {
+
+		try {
+			int64_t val = std::stoll(str);
+	
+			if (val < INT16_MIN || val > UINT16_MAX) {
+				return false;
+			}
+	
+			i = (int16_t) val;
+
+			return true;
+	
+		} catch (const std::out_of_range&) {
+			return false;
+		}
+	}
+
+	static bool 
+	str_to_i32(const std::string& str, int32_t& i) {
+
+		try {
+			int64_t val = std::stoll(str);
+	
+			if (val < INT32_MIN || val > UINT32_MAX) {
+				return false;
+			}
+	
+			i = (int16_t) val;
+			
+			return true;
+	
+		} catch (const std::out_of_range&) {
+			return false;
+		}
+	}
+
+	static bool 
+	str_to_i64(const std::string& str, int64_t& i) {
+
+		try {
+
+			int64_t val = std::stoll(str);
+			i = (int64_t) val;
+			return true;
+
+		} catch (const std::out_of_range&) {
+
+			try {
+				int64_t val = std::stoull(str);
+				i = (int64_t) val;
+				return true;
+
+			} catch (const std::out_of_range&) {
+				return false;
+			}
+		}
+	}
+
+	static bool 
+	str_to_f32(const std::string& str, float& f) {
+
+		try {
+			f = std::stof(str);
+			return true;
+		} catch (const std::out_of_range&) {
+			return false;
+		}
+
+	}
+
+	static bool 
+	str_to_f64(const std::string& str, double& f) {
+
+		try {
+			f = std::stod(str);
+			return true;
+		} catch (const std::out_of_range&) {
+			return false;
+		}
+		
+	}
 }
 
 #endif // CUTEASM_UTILS_HPP
