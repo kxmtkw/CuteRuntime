@@ -337,19 +337,19 @@ HANDLER_CAST_F2U:
 HANDLER_LOAD_I16:
 	r1 = instrs[ctx->ip++];
 	_ct_load_bytes(instrs, &ctx->ip, 2, &i16);
-	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=ct_image_byteswap_u16(i16)}, CT_ATOM_PRIMITIVE);
+	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=(int16_t)ct_image_byteswap_u16(i16)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_LOAD_I32:
 	r1 = instrs[ctx->ip++];
 	_ct_load_bytes(instrs, &ctx->ip, 4, &i32);
-	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=ct_image_byteswap_u32(i32)}, CT_ATOM_PRIMITIVE);
+	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=(int32_t)ct_image_byteswap_u32(i32)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_LOAD_I64:
 	r1 = instrs[ctx->ip++];
 	_ct_load_bytes(instrs, &ctx->ip, 8, &i64);
-	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=ct_image_byteswap_u64(i64)}, CT_ATOM_PRIMITIVE);
+	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=(int64_t)ct_image_byteswap_u64(i64)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_LOAD_F32:

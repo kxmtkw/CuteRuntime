@@ -66,7 +66,7 @@ namespace CtUtils {
 		try {
 			int64_t val = std::stoll(str);
 	
-			if (val < INT16_MIN || val > UINT16_MAX) {
+			if (val < INT16_MIN || val > INT16_MAX) {
 				return false;
 			}
 	
@@ -85,7 +85,7 @@ namespace CtUtils {
 		try {
 			int64_t val = std::stoll(str);
 	
-			if (val < INT32_MIN || val > UINT32_MAX) {
+			if (val < INT32_MIN || val > INT32_MAX) {
 				return false;
 			}
 	
@@ -108,15 +108,7 @@ namespace CtUtils {
 			return true;
 
 		} catch (const std::out_of_range&) {
-
-			try {
-				int64_t val = std::stoull(str);
-				i = (int64_t) val;
-				return true;
-
-			} catch (const std::out_of_range&) {
-				return false;
-			}
+			return false;
 		}
 	}
 

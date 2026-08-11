@@ -85,6 +85,11 @@ void CtTokenizer::tokenize_number() {
 			continue;
 		}
 
+		if (c == '-' and start == mCurrent) {
+			next();
+			continue;
+		}
+
 		if (c == '.') {
 
 			if (is_float) {
@@ -220,6 +225,16 @@ CtTokenStream CtTokenizer::tokenize(std::string source) {
 		}
 		else if (std::isdigit(c)) {
 			tokenize_number();
+		}
+		else if (c == '-') {
+			next();
+			if (std::isdigit(peek())) {
+				backtrack();
+				tokenize_number();
+			} else {
+				backtrack();
+				tokenize_symbol();
+			}
 		}
 		else if (c == '#') {
 			read_comment();

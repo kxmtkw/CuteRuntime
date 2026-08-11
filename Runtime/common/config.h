@@ -21,7 +21,7 @@ Whether to run in debug mode or not.
 For now, debug mode offers:
 - Rich logs for each and every subsystem of the runtime.
 */
-#define CT_CONF_DEBUG
+//#define CT_CONF_DEBUG
 
 
 #ifdef CT_CONF_DEBUG
