@@ -22,18 +22,18 @@ Make a `demo.csm` file in your project. Write the following assembly in it.
 
 ```bash
 # a loop based implementation of the power function. $0 is base and $1 is the exponent
-proc 1 (2) {
+proc 1: 2 {
 	# $0 and $1 are filled with the passed arguments by the engine.
 
-	setu $2 1;
-	setu $3 1;
+	loadi32 $2 1;
+	loadi32 $3 1;
 
 	@loop;
 
-	mulu $3 $3 $0;
+	mul $3 $3 $0;
 	
-	cmpu $2 $1;
-	incu $2;
+	cmpi $2 $1;
+	inc $2;
 
 	jmplt loop;
 
@@ -41,19 +41,19 @@ proc 1 (2) {
 }
 
 # procedure 0 is the entry point of the program. It takes 0 arguments.
-proc 0 (0) {
+proc 0: 0 {
 
 	# set up the arguments
-	setu $0 5; # the base
-	setu $1 4; # the power
+	loadi32 $0 5; # the base
+	loadi32 $1 4; # the power
 
 	# set up the proc id to be called
-	setu $2 1;
+	loadi32 $2 1;
 	call $2 $0 $4; # here $2 holds the id, $0 is the arg start slot and $4 is the return slot
 
 	out $3 $4; # should print [ uint 125 ]
 
-	setu $3 0;
+	loadi32 $3 0;
 	halt $3; # exits with code 0
 }
 ```
