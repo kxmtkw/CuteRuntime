@@ -45,11 +45,11 @@ static const std::map<std::string, std::pair<CtInstr, std::vector<CtInstrOperand
 
 	{"mov",         {CT_INSTR_MOV,         {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 
-	{"li16",        {CT_INSTR_LOAD_I16,    {CtInstrOperandType::Slot, CtInstrOperandType::I16}}},
-	{"li32",        {CT_INSTR_LOAD_I32,    {CtInstrOperandType::Slot, CtInstrOperandType::I32}}},
-	{"li64",        {CT_INSTR_LOAD_I64,    {CtInstrOperandType::Slot, CtInstrOperandType::I64}}},
-	{"lf32",        {CT_INSTR_LOAD_F32,    {CtInstrOperandType::Slot, CtInstrOperandType::F32}}},
-	{"lf64",        {CT_INSTR_LOAD_F64,    {CtInstrOperandType::Slot, CtInstrOperandType::F64}}},
+	{"loadi16",        {CT_INSTR_LOAD_I16,    {CtInstrOperandType::Slot, CtInstrOperandType::I16}}},
+	{"loadi32",        {CT_INSTR_LOAD_I32,    {CtInstrOperandType::Slot, CtInstrOperandType::I32}}},
+	{"loadi64",        {CT_INSTR_LOAD_I64,    {CtInstrOperandType::Slot, CtInstrOperandType::I64}}},
+	{"loadf32",        {CT_INSTR_LOAD_F32,    {CtInstrOperandType::Slot, CtInstrOperandType::F32}}},
+	{"loadf64",        {CT_INSTR_LOAD_F64,    {CtInstrOperandType::Slot, CtInstrOperandType::F64}}},
 
 	{"i2f",         {CT_INSTR_CAST_I2F,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 	{"f2i",         {CT_INSTR_CAST_F2I,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},

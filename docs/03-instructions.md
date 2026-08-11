@@ -53,45 +53,45 @@ Moves (or rather copies) data from $y to $x.
 ---
 
 #### CT_INSTR_LOAD_I16        `0x21`
-Assembler Repr: `li16`
+Assembler Repr: `loadi16`
 ```
-li16 $x imm16 // imm16 -> $x
+loadi16 $x imm16 // imm16 -> $x
 ```
 Reads an int and writes the value to $x.
 
 ---
 
 #### CT_INSTR_LOAD_I32        `0x22`
-Assembler Repr: `li32`
+Assembler Repr: `loadi32`
 ```
-li32 $x imm32 // imm32 -> $x
+loadi32 $x imm32 // imm32 -> $x
 ```
 Reads an int and writes the value to $x.
 
 ---
 
 #### CT_INSTR_LOAD_I64        `0x23`
-Assembler Repr: `li64`
+Assembler Repr: `loadi64`
 ```
-li64 $x imm64 // imm64 -> $x
+loadi64 $x imm64 // imm64 -> $x
 ```
 Reads an int and writes the value to $x.
 
 ---
 
 #### CT_INSTR_LOAD_F32        `0x24`
-Assembler Repr: `lf32`
+Assembler Repr: `loadf32`
 ```
-lf32 $x imm32 // imm32 -> $x
+loadf32 $x imm32 // imm32 -> $x
 ```
 Reads an int and writes the value to $x.
 
 ---
 
 #### CT_INSTR_LOAD_F64        `0x25`
-Assembler Repr: `lf64`
+Assembler Repr: `loadf64`
 ```
-lf64 $x imm64 // imm64 -> $x
+loadf64 $x imm64 // imm64 -> $x
 ```
 Reads an int and writes the value to $x.
 
