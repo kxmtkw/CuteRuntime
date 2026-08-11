@@ -10,6 +10,7 @@ extern "C" {
 	#include "CuteInstr.h"
 }
 
+#include "spec/instructions.hpp"
 #include "tokenizer/tokens.hpp"
 #include "utils/utils.hpp"
 
@@ -43,7 +44,7 @@ class CtCodeGen {
 
 	// Parse an expression inside an instruction
 	void
-	parse_expression();
+	parse_operand(CtInstrOperandType optype);
 
 	// Resolve all jump offsets.
 	void
