@@ -39,7 +39,7 @@ typedef struct {
 
 // call stack, statically sized
 typedef struct {
-	CtCallFrame  frames[CT_CONF_CALLSTACK_SIZE];
+	CtCallFrame* frames;
 	uint32_t     size;
 	uint32_t     capacity;
 } CtCallStack;

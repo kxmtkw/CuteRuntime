@@ -25,24 +25,26 @@ thread_local CtError ct_thread_error;
 // Call Stack helpers
 
 static inline void
-ct_ctx_initStack(CtCallStack* s) {
+ct_ctx_init_call_stack(CtCallStack* s) {
     s->size     = 0;
     s->capacity = CT_CONF_CALLSTACK_SIZE;
+	s->frames = malloc(sizeof(CtCallFrame) * s->capacity);
 }
 
 static inline void 
-ct_ctx_delStack(CtCallStack* s) {
+ct_ctx_del_call_stack(CtCallStack* s) {
     s->size    = 0;
     s->capacity = 0;
+	if (s->frames) free(s->frames);
 }
 
 static inline CtCallFrame*
-ct_ctx_getFrame(CtCallStack* s) {	
+ct_ctx_get_new_frame(CtCallStack* s) {	
 	return &s->frames[s->size++];
 }
 
 static inline CtCallFrame* 
-ct_ctx_popFrame(CtCallStack* s) {
+ct_ctx_pop_frame(CtCallStack* s) {
     if (s->size > 0) {
 		return &s->frames[--s->size];
 	};	
@@ -50,7 +52,7 @@ ct_ctx_popFrame(CtCallStack* s) {
 }
 
 static inline CtCallFrame* 
-ct_ctx_peekFrame(CtCallStack* s) {
+ct_ctx_get_top_frame(CtCallStack* s) {
     if (s->size > 0) {
 		return &s->frames[s->size-1];
 	};	
@@ -67,7 +69,7 @@ ct_ctx_new(CtImage* img, CtObjectManager* objects, uint32_t procedure_id) {
 	ctx->objects = objects;
 	ctx->running = true;
 	ctx->current_frame = NULL;
-	ct_ctx_initStack(&ctx->callstack);
+	ct_ctx_init_call_stack(&ctx->callstack);
 	ct_ctx_call_procedure(ctx, procedure_id, 0, 0);
 	return ctx;
 }
@@ -75,7 +77,7 @@ ct_ctx_new(CtImage* img, CtObjectManager* objects, uint32_t procedure_id) {
 
 void
 ct_ctx_del(CtContext* ctx) {
-	ct_ctx_delStack(&ctx->callstack);
+	ct_ctx_del_call_stack(&ctx->callstack);
 }
 
 
@@ -121,7 +123,7 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 		return;
 	};
 
-	CtCallFrame* frame = ct_ctx_getFrame(&ctx->callstack);
+	CtCallFrame* frame = ct_ctx_get_new_frame(&ctx->callstack);
 
 	frame->procedure_id = procedure_id;
 	frame->object_field_count = 0;
@@ -141,7 +143,7 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 		}
 	};
 	
-	ctx->current_frame = ct_ctx_peekFrame(&ctx->callstack);
+	ctx->current_frame = ct_ctx_get_top_frame(&ctx->callstack);
 	ctx->ip = proc.bytecode_index;
 	
 	CT_LOG(
@@ -155,8 +157,8 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 void
 ct_ctx_return_procedure(CtContext* ctx, CtAtom returned_atom, CtAtomType returned_atom_type) {
 
-	CtCallFrame* frame = ct_ctx_popFrame(&ctx->callstack);
-	ctx->current_frame = ct_ctx_peekFrame(&ctx->callstack);
+	CtCallFrame* frame = ct_ctx_pop_frame(&ctx->callstack);
+	ctx->current_frame = ct_ctx_get_top_frame(&ctx->callstack);
 
 	if (ctx->current_frame == NULL) {
 		ctx->running = false;
