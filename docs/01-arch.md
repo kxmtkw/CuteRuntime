@@ -32,9 +32,8 @@ Executable Image (.cute)
 .
 ├── Assembler # Main Assembler Source Code
 │   ├── assembler # asssembler Core
-│   ├── codegen  # writing bytecode
+│   ├── codegen  # writing bytecode and resolving symbols
 │   ├── include # public header
-│   ├── resolver # resolving jumps and converting tokens to bytecode
 │   ├── spec # instruction maps and program repr
 │   └── tokenizer # lexing asm files
 │
