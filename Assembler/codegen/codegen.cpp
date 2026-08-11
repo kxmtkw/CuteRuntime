@@ -1,5 +1,4 @@
 
-#include "codegen/codegen.hpp"
 #include "utils/utils.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -14,6 +13,7 @@ extern "C" {
 	#include "CuteInstr.h"
 }
 
+#include "codegen/codegen.hpp"
 #include "tokenizer/tokens.hpp"
 #include "spec/instructions.hpp"
 
@@ -71,7 +71,7 @@ CtCodeGen::parse_procedure() {
 void
 CtCodeGen::parse_procedure_statement() {
 
-	if (mStream.expect_token("@")) {
+	if (mStream.expect_token("label")) {
 		parse_label();		
 	} else {
 		parse_instruction();
@@ -83,11 +83,15 @@ void
 CtCodeGen::parse_label() {
 	std::string label;
 
-	mStream.expect_type(CtTokenType::Word, &label);
+	if (!mStream.expect_type(CtTokenType::Word, &label)) {
+		throw_error("Expected indentifier as label name.");
+	}
 
 	mJumpAddresses[label] = mBuilder.image.header.instruction_count;
 	
-	mStream.expect_token(";");
+	if (!mStream.expect_token(";")) {
+		throw_error("Statement should have ended here. Expected ;");
+	}
 
 	return;
 }
@@ -104,7 +108,6 @@ CtCodeGen::parse_instruction() {
 	
 	if (!ct_instr_map.contains(val)) {
 		throw_error(std::format("Unknown Instruction: {}", val));
-		return;
 	}
 
 	auto instr_info = ct_instr_map.at(val);
@@ -118,14 +121,14 @@ CtCodeGen::parse_instruction() {
 
 		if (mStream.expect_token(";")) {
 			throw_error("Instruction ended too soon.");
-			return;
-			exit(1);
 		}
 
 		parse_operand(t);
 	}
 
-	mStream.expect_token(";");
+	if (!mStream.expect_token(";")) {
+		throw_error("Statement should have ended here. Expected ;");
+	}
 }
 
 
@@ -135,8 +138,6 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 	if (optype == CtInstrOperandType::Slot) {
 		if (!mStream.expect_type(CtTokenType::Slot, &val)) {
 			throw_error("Expected slot.");
-			return;
-			exit(1);
 		}	
 		byte slot_index = static_cast<byte>(std::stoi(val));
 		ct_image_builder_add_u8(&mBuilder, static_cast<uint8_t>(slot_index));
@@ -146,8 +147,6 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 	else if (optype == CtInstrOperandType::I8) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int8.");
-			return;
-			exit(1);
 		}
 		int8_t number = static_cast<int8_t>(std::stoi(val));
 		ct_image_builder_add_u8(&mBuilder, static_cast<uint8_t>(number));
@@ -156,31 +155,29 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 	else if (optype == CtInstrOperandType::I16) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int16.");
-			return;
-			exit(1);
 		}
 		int16_t number = static_cast<int16_t>(std::stoi(val));
 		ct_image_builder_add_u16(&mBuilder, static_cast<uint16_t>(number));
 	} 
 
 	else if (optype == CtInstrOperandType::I32) {
-		if (!mStream.expect_type(CtTokenType::Int, &val)) {
+		if (mStream.expect_type(CtTokenType::Int, &val)) {
 			int32_t number = std::stoi(val);
 			ct_image_builder_add_u32(&mBuilder, static_cast<uint32_t>(number));
-			
+			return;
+
 		} else if (mStream.expect_type(CtTokenType::Word, &val)) {
 			mPatches[mBuilder.image.header.instruction_count] = val;
 			ct_image_builder_add_u32(&mBuilder, 0);
+			return;
 		}
+
 		throw_error("Expected int32.");
-		exit(1);
 	} 
 
 	else if (optype == CtInstrOperandType::I64) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int64.");
-			return;
-			exit(1);
 		}
 		int64_t number = std::stoll(val);
 		ct_image_builder_add_u64(&mBuilder, static_cast<uint64_t>(number));
@@ -189,8 +186,6 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 	else if (optype == CtInstrOperandType::F32) {
 		if (!mStream.expect_type(CtTokenType::Float, &val)) {
 			throw_error("Expected float32.");
-			return;
-			exit(1);
 		}
 		float number = std::stof(val);
 		ct_image_builder_add_f32(&mBuilder, number);
@@ -199,8 +194,6 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 	else if (optype == CtInstrOperandType::F64) {
 		if (!mStream.expect_type(CtTokenType::Float, &val)) {
 			throw_error("Expected float64");
-			return;
-			exit(1);
 		}
 		double number = std::stod(val);
 		ct_image_builder_add_f64(&mBuilder, number);
@@ -214,8 +207,7 @@ CtCodeGen::resolve_jumps() {
 		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
 
 		if (!mJumpAddresses.contains(item.second)) {
-			throw_error("Unknown Word.");
-			return;
+			throw_error(std::format("Unknown identifier: {}", item.second));
 		}
 
 		int jump_location = mJumpAddresses[item.second];
@@ -227,14 +219,11 @@ CtCodeGen::resolve_jumps() {
 
 void
 CtCodeGen::throw_error(std::string details) {
-	unsigned int index = mStream.peek().start;
-	mError.add_error(
-		CtUtils::count_lines_up_to_index(mStream.get_source(), index), 
-		CtUtils::get_line_at_index(mStream.get_source(), index), 
+	CtUtils::raise_error(
+		mStream.get_source(),
+		mStream.peek().start,
 		details
 	);
-	mError.print();
-	exit(1);
 }
 
 void

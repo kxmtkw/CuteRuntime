@@ -17,8 +17,6 @@ extern "C" {
 
 class CtCodeGen {
 
-	CtUtils::ErrorCollector& mError;
-
 	CtImageBuilder mBuilder;
 
 	CtTokenStream mStream;
@@ -54,8 +52,6 @@ class CtCodeGen {
 	throw_error(std::string details);
 
 	public:
-
-	CtCodeGen(CtUtils::ErrorCollector& err): mError(err) {};
 
 	void
 	generate(CtTokenStream stream, std::string outpath);

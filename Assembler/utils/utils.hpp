@@ -4,79 +4,58 @@
 #include <format>
 #include <iostream>
 #include <string_view>
-#include <vector>
+#include <sstream>
 
 
 namespace CtUtils {
 
 
-
-	struct ErrorCollector {
-
-		bool mHasError = false;
-		std::vector<std::string> mErrorStrings;
-
-		public:
-
-		bool
-		has_error() {return mHasError;}
-
-		void
-		add_error(int line_num, std::string_view line, std::string details) {
-			std::string error = std::format(
-				"[ERROR] {}\nLine: {}\n{}\n", details, line_num, line
-			);
-			mHasError = true;
-			mErrorStrings.push_back(error);
-		}
-
-		void
-		print() {
-			for (auto str: mErrorStrings) {
-				std::cout << str;
-			}
-		}
-	};
-
-
-	static unsigned int 
-	count_lines_up_to_index(std::string_view source, size_t index) {
-		if (source.empty()) {
-			return 1;
-		}
-
-		if (index > source.size()) {
-			index = source.size();
-		}
+	static std::pair<unsigned int, unsigned int>
+	get_character_location(const std::string& source, size_t index) {
 
 		unsigned int line_count = 1;
+		unsigned int last_line_at = 0;
+
 		for (size_t i = 0; i < index; ++i) {
 			if (source[i] == '\n') {
 				line_count++;
+				last_line_at = i;
 			}
 		}
 
-		return line_count;
+		return {line_count, index - last_line_at};
 	}
 
 
-	static std::string_view
-	get_line_at_index(std::string_view source, size_t index) {
-		if (source.empty() || index >= source.size()) {
-			return {};
+	static std::string
+	get_line_at_index(const std::string& source, unsigned int line) {
+
+		std::istringstream stream(source);
+		std::string line_str;
+		unsigned int current_line = 1;
+	
+		while (std::getline(stream, line_str)) {
+			if (current_line == line) {
+				return line_str;
+			}
+			current_line++;
 		}
-
-		size_t line_start = source.rfind('\n', index);
-		line_start = (line_start == std::string_view::npos) ? 0 : line_start + 1;
-
-		size_t line_end = source.find('\n', index);
-		if (line_end == std::string_view::npos) {
-			line_end = source.size();
-		}
-
-		return source.substr(line_start, line_end - line_start);
+	
+		return ""; 
 	}
 
+	static void 
+	raise_error(const std::string& source, unsigned int char_index, std::string details) {
+
+		auto location = get_character_location(source, char_index);
+		unsigned int line = location.first;
+		unsigned int col = location.second;
+
+		std::string line_str = get_line_at_index(source, line);
+
+		std::cout << std::format("[Error] {}\nLine: {} Col: {}\n{}\n", details, line, col, line_str);
+		exit(1);
+	};
 }
 
 #endif // CUTEASM_UTILS_HPP

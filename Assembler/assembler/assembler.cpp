@@ -33,21 +33,11 @@ void CtAssembler::assemble(std::string filepath) {
 
 void CtAssembler::assemble_string(std::string source, std::string outfile) {
 
-	CtUtils::ErrorCollector error;
-	CtTokenizer tokenizer(error);
-
+	CtTokenizer tokenizer;
 	auto stream = tokenizer.tokenize(std::move(source));
 
-	if (error.has_error()) {
-		error.print();
-		exit(1);
-	}
 
-	CtCodeGen generator(error);
+	CtCodeGen generator;
 	generator.generate(std::move(stream), outfile);
 
-	if (error.has_error()) {
-		error.print();
-		exit(1);
-	}
 }

@@ -12,7 +12,6 @@
 
 class CtTokenizer {
 
-	CtUtils::ErrorCollector& mError;
 	std::string mSource;
 	std::vector<CtToken> mTokens;
 	uint mCurrent;
@@ -57,8 +56,6 @@ class CtTokenizer {
 	void throw_error(std::string details);
 
 public:
-
-	CtTokenizer(CtUtils::ErrorCollector& err): mError(err) {};
 
 	// tokenize a string and return CtTokenStream object.
 	CtTokenStream tokenize(std::string source);

@@ -89,7 +89,6 @@ void CtTokenizer::tokenize_number() {
 
 			if (is_float) {
 				throw_error("Illegal symbol.");
-				return;
 			}
 
 			is_float = true;
@@ -100,7 +99,6 @@ void CtTokenizer::tokenize_number() {
 
 		if (std::isalpha(c)) {
 			throw_error("Did not expect alphabetic character.");
-			return;
 		}
 		
 		break;
@@ -121,7 +119,6 @@ void CtTokenizer::tokenize_char() {
 	
 	if (c != '\'') {
 		throw_error("Unterminated char or Too long char.");
-		return;
 	}
 
 	mTokens.emplace_back(CtToken(CtTokenType::Char, start, 1));
@@ -142,7 +139,6 @@ void CtTokenizer::tokenize_string() {
 
 		if (eof()) {
 			throw_error("Unterminated string.");
-			return;
 		}
 
 		if (c == '\\') {
@@ -182,7 +178,6 @@ void CtTokenizer::tokenize_slot() {
 		
 		if (std::isalpha(c)) {
 			throw_error("Illegal alphabetic character.");
-			return;
 		}
 
 		break;
@@ -190,7 +185,6 @@ void CtTokenizer::tokenize_slot() {
 
 	if (start == mCurrent) {
 		throw_error("Empty Slot.");
-		return;
 	}
 
 	mTokens.emplace_back(CtToken(CtTokenType::Slot, start, mCurrent-start));
@@ -198,9 +192,9 @@ void CtTokenizer::tokenize_slot() {
 
 
 void CtTokenizer::throw_error(std::string details) {
-	mError.add_error(
-		CtUtils::count_lines_up_to_index(mSource, mCurrent), 
-		CtUtils::get_line_at_index(mSource, mCurrent), 
+	CtUtils::raise_error(
+		mSource, 
+		mCurrent, 
 		details
 	);
 }
