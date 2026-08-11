@@ -3,6 +3,7 @@
 
 // Main Cute Instruction Set.
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef enum {
@@ -197,6 +198,9 @@ ct_image_load(CtImage *img, const char *filepath);
 void 
 ct_image_free(CtImage *img);
 
+
+void 
+ct_image_print(const CtImage* image);
 
 
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)

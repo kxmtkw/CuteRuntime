@@ -78,15 +78,15 @@ ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_cou
 
 	uint32_t current_proc_count = builder->image.header.procedure_count;
 	
-	// If id extends past current procedure count, ensure capacity covers up to id or sequential index
-	uint32_t target_index = (id >= current_proc_count) ? id : current_proc_count;
-	_ct_ensure_proc_cap(builder, target_index + 1);
+	if (id >= current_proc_count) {
+		_ct_ensure_proc_cap(builder, id + 1);
+	}	
+	
+	builder->image.procedure_table[id].bytecode_index = builder->image.header.instruction_count;
+	builder->image.procedure_table[id].arg_count = arg_count;
 
-	builder->image.procedure_table[target_index].bytecode_index = builder->image.header.instruction_count;
-	builder->image.procedure_table[target_index].arg_count = arg_count;
-
-	if (target_index >= builder->image.header.procedure_count) {
-		builder->image.header.procedure_count = target_index + 1;
+	if (id >= builder->image.header.procedure_count) {
+		builder->image.header.procedure_count = id + 1;
 	}
 
 	return builder->image.header.instruction_count;
@@ -249,3 +249,45 @@ ct_image_free(CtImage* img)
 		img->instruction_pool = NULL;
 	}
 };
+
+
+void ct_image_print(const CtImage* image) {
+	if (!image) {
+		printf("CtImage: NULL\n");
+		return;
+	}
+
+	printf("================ [ CtImage ] ================\n");
+	printf("Header:\n");
+	printf("  Magic ID:          0x%08X\n", (unsigned int)image->header.magic_id);
+	printf("  Version:           0x%08X (%u)\n", (unsigned int)image->header.version, (unsigned int)image->header.version);
+	printf("  Procedure Count:   0x%X (%u)\n", (unsigned int)image->header.procedure_count, (unsigned int)image->header.procedure_count);
+	printf("  Instruction Count: 0x%X (%u)\n", (unsigned int)image->header.instruction_count, (unsigned int)image->header.instruction_count);
+	printf("---------------------------------------------\n");
+
+	printf("Procedure Table Address: %p\n", (void*)image->procedure_table);
+	if (image->procedure_table && image->header.procedure_count > 0) {
+		for (uint32_t i = 0; i < image->header.procedure_count; ++i) {
+			printf("  Proc [%04X]: Bytecode Index = 0x%08X, Arg Count = 0x%X (%u)\n",
+				   (unsigned int)i,
+				   (unsigned int)image->procedure_table[i].bytecode_index,
+				   (unsigned int)image->procedure_table[i].arg_count,
+				   (unsigned int)image->procedure_table[i].arg_count);
+		}
+	} else {
+		printf("  (empty or null procedure table)\n");
+	}
+
+	printf("---------------------------------------------\n");
+	printf("Instruction Pool Address: %p\n", (void*)image->instruction_pool);
+	if (image->instruction_pool && image->header.instruction_count > 0) {
+		for (uint32_t i = 0; i < image->header.instruction_count; ++i) {
+			printf("  Instr [%04X]: 0x%08X\n",
+				   (unsigned int)i,
+				   (unsigned int)image->instruction_pool[i]);
+		}
+	} else {
+		printf("  (empty or null instruction pool)\n");
+	}
+	printf("=============================================\n");
+}
