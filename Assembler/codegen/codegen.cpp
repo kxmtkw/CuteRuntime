@@ -71,7 +71,7 @@ CtCodeGen::parse_procedure() {
 void
 CtCodeGen::parse_procedure_statement() {
 
-	if (mStream.expect_token("label")) {
+	if (mStream.expect_token("@")) {
 		parse_label();		
 	} else {
 		parse_instruction();
