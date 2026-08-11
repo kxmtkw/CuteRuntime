@@ -141,13 +141,12 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 	};
 	
 
-	ctx->ip = proc.bytecode_index;
 	ctx->current_frame = ct_ctx_peekFrame(&ctx->callstack);
 
 	CT_LOG(
 		"context", 
-		"Called procedure(%u) with %u arguments passed from previous frame's slot %d\n", 
-		procedure_id, arg_count, arg_start_slot
+		"Called procedure(%u) with %u arguments passed from previous frame's slot %d. Jumped to address %u.\n", 
+		procedure_id, arg_count, arg_start_slot, proc.bytecode_index
 	);
 }
 
