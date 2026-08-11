@@ -24,11 +24,11 @@ jmp LABEL_NAME;
 ### Procedures
 To declare a procedure, use the `proc` keyword followed by its numerical id and the number of arguments it accepts.
 ```
-proc ID (ARG_COUNT) {
+proc ID: ARG_COUNT {
 
 }
 
-proc 0 (0) {
+proc 0: 0 {
 
 }
 ```

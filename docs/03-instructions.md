@@ -52,30 +52,48 @@ Moves (or rather copies) data from $y to $x.
 
 ---
 
-#### CT_INSTR_SETI        `0x21`
-Assembler Repr: `seti`
+#### CT_INSTR_LOAD_I16        `0x21`
+Assembler Repr: `li16`
 ```
-seti $x imm32 // imm32 -> $x
+li16 $x imm16 // imm16 -> $x
 ```
 Reads an int and writes the value to $x.
 
 ---
 
-#### CT_INSTR_SETU        `0x22`
-Assembler Repr: `setu`
+#### CT_INSTR_LOAD_I32        `0x22`
+Assembler Repr: `li32`
 ```
-setu $x imm32 // imm32 -> $x
+li32 $x imm32 // imm32 -> $x
 ```
-Reads an uint and writes the value to $x.
+Reads an int and writes the value to $x.
 
 ---
 
-#### CT_INSTR_SETF        `0x23`
-Assembler Repr: `setf`
+#### CT_INSTR_LOAD_I64        `0x23`
+Assembler Repr: `li64`
 ```
-setf $x imm32 // imm32 -> $x
+li64 $x imm64 // imm64 -> $x
 ```
-Reads an float and writes the value to $x.
+Reads an int and writes the value to $x.
+
+---
+
+#### CT_INSTR_LOAD_F32        `0x24`
+Assembler Repr: `lf32`
+```
+lf32 $x imm32 // imm32 -> $x
+```
+Reads an int and writes the value to $x.
+
+---
+
+#### CT_INSTR_LOAD_F64        `0x25`
+Assembler Repr: `lf64`
+```
+lf64 $x imm64 // imm64 -> $x
+```
+Reads an int and writes the value to $x.
 
 ---
 
@@ -136,32 +154,17 @@ Assembler Repr: `negi`
 #### CT_INSTR_ABSI        `0x36`
 Assembler Repr: `absi`
 
-#### CT_INSTR_INCI        `0x37`
-Assembler Repr: `inci`
-
-#### CT_INSTR_DECI        `0x38`
-Assembler Repr: `deci`
-
-#### CT_INSTR_ADDU        `0x40`
-Assembler Repr: `addu`
-
-#### CT_INSTR_SUBU        `0x41`
-Assembler Repr: `subu`
-
-#### CT_INSTR_MULU        `0x42`
-Assembler Repr: `mulu`
-
-#### CT_INSTR_DIVU        `0x43`
+#### CT_INSTR_DIVU        `0x37`
 Assembler Repr: `divu`
 
-#### CT_INSTR_MODU        `0x44`
+#### CT_INSTR_MODU        `0x38`
 Assembler Repr: `modu`
 
-#### CT_INSTR_INCU        `0x45`
-Assembler Repr: `incu`
+#### CT_INSTR_INC         `0x3A`
+Assembler Repr: `inc`
 
-#### CT_INSTR_DECU        `0x46`
-Assembler Repr: `decu`
+#### CT_INSTR_DEC         `0x3B`
+Assembler Repr: `dec`
 
 #### CT_INSTR_ADDF        `0x50`
 Assembler Repr: `addf`
