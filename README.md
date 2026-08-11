@@ -14,7 +14,7 @@
 - As fast and optimized as possible without the need of a JIT (for now).
 - Featureful runtime.
 - Easily extendable.
-- Extremely flexible runtime.
+- Extremely flexible.
 
 ### Example
 
