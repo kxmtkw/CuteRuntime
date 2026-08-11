@@ -120,6 +120,7 @@ CtCodeGen::parse_instruction() {
 	for (CtInstrOperandType t: operands) {
 
 		if (mStream.expect_token(";")) {
+			mStream.backtrack();
 			throw_error("Instruction ended too soon.");
 		}
 
