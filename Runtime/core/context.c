@@ -128,6 +128,7 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 	frame->return_ip = ctx->ip;
 	frame->return_value_slot = return_slot;
 	frame->args_count = arg_count;
+	
 	memset(frame->file.types, 0, CT_CONF_FIXED_SLOT_COUNT);
 
 	for (size_t i = 0; i < arg_count; i++) {
@@ -140,9 +141,9 @@ ct_ctx_call_procedure(CtContext* ctx, uint32_t procedure_id, uint8_t arg_start_s
 		}
 	};
 	
-
 	ctx->current_frame = ct_ctx_peekFrame(&ctx->callstack);
-
+	ctx->ip = proc.bytecode_index;
+	
 	CT_LOG(
 		"context", 
 		"Called procedure(%u) with %u arguments passed from previous frame's slot %d. Jumped to address %u.\n", 
