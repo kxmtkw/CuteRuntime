@@ -24,16 +24,22 @@ void
 CtCodeGen::parse_procedure() {
 
 	mJumpAddresses.clear();
-	mPatches.clear();
 	
 	std::string val;
 
-	if (!mStream.expect_type(CtTokenType::Int, &val)) {
-		throw_error("Expected integar for procedure id.");
+	if (!mStream.expect_type(CtTokenType::Word, &val)) {
+		throw_error("Expected identifier for procedure id.");
 		return;
 	}
 
-	uint32_t id = std::stoul(val);
+
+	if (val == "main") {
+		mMainFound = true;
+	} else {
+		mProcedureMap[val] = mProcedureMap.size();	
+	}
+	
+	uint32_t id = mProcedureMap[val];
 
 	if (!(mStream.expect_token(":") &&mStream.expect_type(CtTokenType::Int, &val))) {
 		throw_error("Invalid argument format.");
@@ -198,7 +204,11 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 			ct_image_builder_add_u32(&mBuilder, static_cast<uint32_t>(number));
 			return;
 
-		} 
+		}  else if (mStream.expect_type(CtTokenType::Word, &val)) {
+			mPatches[mBuilder.image.header.instruction_count] = val;
+			ct_image_builder_add_u32(&mBuilder, 0);
+			return;
+		}
 
 		throw_error("Expected uint32.");
 	}
@@ -244,19 +254,46 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 
 void
 CtCodeGen::resolve_jumps() {
+
+	std::vector<uint32_t> found_patches;
+
 	for (auto item: mPatches) {
+
 		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
 
-		if (!mJumpAddresses.contains(item.second)) {
-			throw_error(std::format("Unknown identifier: {}", item.second));
+		if (mJumpAddresses.contains(item.second)) {
+			int jump_location = mJumpAddresses[item.second];
+			int current_location = item.first + 4;
+			int offset = jump_location - current_location;
+			memcpy(ptr, &offset, sizeof(offset));
+			found_patches.push_back(item.first);
 		}
+	}
 
-		int jump_location = mJumpAddresses[item.second];
-		int current_location = item.first + 4;
-		int offset = jump_location - current_location;
-		memcpy(ptr, &offset, sizeof(offset));
+	for (auto found: found_patches) {
+		auto it = mPatches.find(found);
+		if (it != mPatches.end()) {
+			mPatches.erase(it); 
+		}
 	}
 }
+
+
+void
+CtCodeGen::resolve_procedures() {
+	for (auto item: mPatches) {
+
+		uint32_t* ptr = (uint32_t*) ct_image_builder_get_address(&mBuilder, item.first);
+
+		if (mProcedureMap.contains(item.second)) {
+			unsigned int id = mProcedureMap[item.second];
+			memcpy(ptr, &id, sizeof(id));
+		} else {
+			throw_error(std::format("Unknown identifier: {}", item.second));
+		};
+	}
+}
+
 
 void
 CtCodeGen::throw_error(std::string details) {
@@ -274,11 +311,19 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 
 	ct_image_builder_init(&mBuilder, 16, 16, 64);
 
+	mProcedureMap["main"] = 0;
+
 	while (!mStream.eof()) {
 		
 		if (mStream.expect_token("proc")) {
 			parse_procedure();
 		}
+	}
+
+	resolve_procedures();
+
+	if (!mMainFound) {
+		throw_error("procedure main not found!");
 	}
 
 	ct_image_print(&mBuilder.image);

@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 extern "C" {
@@ -21,9 +22,15 @@ class CtCodeGen {
 
 	CtTokenStream mStream;
 
+	std::unordered_set<std::string> mDefinedSymbols;
+	
 	std::unordered_map<std::string, uint32_t> mJumpAddresses;
+	std::unordered_map<std::string, uint32_t> mProcedureMap;
+
 	std::unordered_map<uint32_t, std::string> mPatches;
 
+	bool mMainFound = false;
+	
 	// Parse a procedure
 	void
 	parse_procedure();
@@ -47,6 +54,10 @@ class CtCodeGen {
 	// Resolve all jump offsets.
 	void
 	resolve_jumps();
+
+	// Resolve all remaining patches
+	void
+	resolve_procedures();
 
 	void
 	throw_error(std::string details);
