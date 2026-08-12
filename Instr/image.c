@@ -7,20 +7,23 @@
 
 
 void 
-ct_image_builder_init(CtImageBuilder* builder, uint32_t procedure_reserve, uint32_t instr_reserve) {
+ct_image_builder_init(CtImageBuilder* builder, uint32_t blob_reserve, uint32_t procedure_reserve, uint32_t instr_reserve) {
 
 	if (!builder) return;
 
 	builder->image.header.magic_id = ct_magic_id;
 	builder->image.header.version = CT_CUTE_VERSION;
+	builder->image.header.data_blob_size = 0;
 	builder->image.header.procedure_count = 0;
 	builder->image.header.instruction_count = 0;
 
+	builder->data_blob_cap = blob_reserve > 16 ? blob_reserve: 16;
 	builder->procedure_cap = procedure_reserve > 16 ? procedure_reserve: 16;
 	builder->instruction_cap = instr_reserve > 16 ? instr_reserve: 16;
 
-	builder->image.procedure_table = (CtImageProcedure*) malloc(procedure_reserve * sizeof(CtImageProcedure));
-	builder->image.instruction_pool = (CtInstrSize*) malloc(instr_reserve * sizeof(CtInstrSize));
+	builder->image.data_blob = (CtDataBlobUnit*) malloc(builder->data_blob_cap * sizeof(CtImageProcedure));
+	builder->image.procedure_table = (CtImageProcedure*) malloc(builder->procedure_cap * sizeof(CtImageProcedure));
+	builder->image.instruction_pool = (CtInstrSize*) malloc(builder->instruction_cap * sizeof(CtInstrSize));
 }
 
 
@@ -174,6 +177,25 @@ ct_image_builder_add_f64(CtImageBuilder* builder, double f) {
 }
 
 
+uint32_t
+ct_image_builder_append_data(CtImageBuilder* builder, uint8_t* data, uint32_t size) {
+
+	uint32_t current_size = builder->image.header.data_blob_size;
+
+	if (current_size + size >= builder->data_blob_cap) {
+		builder->data_blob_cap = (builder->data_blob_cap * 2) + size;
+		builder->image.data_blob = (CtDataBlobUnit*) realloc(
+			builder->image.data_blob, 
+			builder->data_blob_cap * sizeof(CtImageProcedure)
+		);
+	}
+
+	memcpy(builder->image.data_blob + current_size, data, size);
+	builder->image.header.data_blob_size += size;
+	return current_size;
+}
+
+
 
 CtImageStatus 
 ct_image_dump(CtImage *img, const char *filepath) {
@@ -184,10 +206,13 @@ ct_image_dump(CtImage *img, const char *filepath) {
 	img->header.magic_id = ct_magic_id;
 	img->header.version = CT_CUTE_VERSION;
 
-	u_int32_t items_written;
+	uint32_t items_written;
 
 	items_written = fwrite(&img->header, sizeof(CtImageHeader), 1, fp);
 	if (items_written != 1) {return CT_IMAGE_STATUS_READ_WRITE_FAILURE;}
+
+	items_written = fwrite(img->data_blob, sizeof(CtDataBlobUnit), img->header.data_blob_size, fp);
+	if (items_written != img->header.data_blob_size) {return CT_IMAGE_STATUS_READ_WRITE_FAILURE;}
 
 	items_written = fwrite(img->procedure_table, sizeof(CtImageProcedure), img->header.procedure_count, fp);
 	if (items_written != img->header.procedure_count) {return CT_IMAGE_STATUS_READ_WRITE_FAILURE;}
@@ -218,6 +243,10 @@ ct_image_load(CtImage *img, const char *filepath) {
 	if (img->header.version != CT_CUTE_VERSION) {
 		return CT_IMAGE_STATUS_VERSION_MISTMATCH;
 	}
+
+	img->data_blob = malloc(sizeof(CtDataBlobUnit) * img->header.data_blob_size);
+	items_read = fread(img->data_blob, sizeof(CtDataBlobUnit), img->header.data_blob_size, fp);
+	if (items_read != img->header.data_blob_size) {return CT_IMAGE_STATUS_READ_WRITE_FAILURE;}
 
 	img->procedure_table = malloc(sizeof(CtImageProcedure) * img->header.procedure_count);
 	items_read = fread(img->procedure_table, sizeof(CtImageProcedure), img->header.procedure_count, fp);

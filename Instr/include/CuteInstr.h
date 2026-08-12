@@ -99,9 +99,12 @@ typedef uint8_t CtInstrSize;
 
 static const uint32_t ct_magic_id = 0x63757465; 
 
+typedef uint8_t CtDataBlobUnit;
+
 typedef struct {
 	uint32_t magic_id;
 	uint32_t version;
+	uint32_t data_blob_size;
 	uint32_t procedure_count;
 	uint32_t instruction_count;
 } CtImageHeader;
@@ -115,6 +118,7 @@ typedef struct {
 
 typedef struct {
 	CtImageHeader       header;
+	CtDataBlobUnit*     data_blob;
 	CtImageProcedure*   procedure_table;
 	CtInstrSize*        instruction_pool;
 } CtImage;
@@ -124,12 +128,13 @@ typedef struct {
 	CtImage  image;
 	uint32_t procedure_cap;
 	uint32_t instruction_cap;
+	uint32_t data_blob_cap;
 } CtImageBuilder;
 
 
 // Intialize an empty image builder
 void
-ct_image_builder_init(CtImageBuilder* builder, uint32_t procedure_reserve, uint32_t instr_reserve);
+ct_image_builder_init(CtImageBuilder* builder, uint32_t blob_reserve, uint32_t procedure_reserve, uint32_t instr_reserve);
 
 // Frees the image's resources
 void
@@ -175,6 +180,10 @@ ct_image_builder_add_f32(CtImageBuilder* builder, float f);
 // Add a f64 to the instruction pool
 void
 ct_image_builder_add_f64(CtImageBuilder* builder, double f);
+
+// Add data to the data blob, returns the offset
+uint32_t
+ct_image_builder_append_data(CtImageBuilder* builder, uint8_t* data, uint32_t size);
 
 
 typedef enum {
