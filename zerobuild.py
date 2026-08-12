@@ -4,7 +4,7 @@ build = Build()
 
 build.compiler = "gcc"
 build.directory = ".build"
-build.arguments = Flags.Wall, Flags.Wextra, Flags.g, Flags.O3
+build.arguments = Flags.Wall, Flags.Wextra, Flags.g
 
 
 # Cute Instructions
