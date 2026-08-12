@@ -16,6 +16,7 @@ enum class CtInstrOperandType {
 	I8,
 	I16,
 	I32,
+	U32,
 	I64,
 	F32,
 	F64
@@ -47,9 +48,8 @@ static const std::map<std::string, std::pair<CtInstr, std::vector<CtInstrOperand
 
 	{"loadi16",        {CT_INSTR_LOAD_I16,    {CtInstrOperandType::Slot, CtInstrOperandType::I16}}},
 	{"loadi32",        {CT_INSTR_LOAD_I32,    {CtInstrOperandType::Slot, CtInstrOperandType::I32}}},
-	{"loadi64",        {CT_INSTR_LOAD_I64,    {CtInstrOperandType::Slot, CtInstrOperandType::I64}}},
+	{"loadu32",        {CT_INSTR_LOAD_U32,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
 	{"loadf32",        {CT_INSTR_LOAD_F32,    {CtInstrOperandType::Slot, CtInstrOperandType::F32}}},
-	{"loadf64",        {CT_INSTR_LOAD_F64,    {CtInstrOperandType::Slot, CtInstrOperandType::F64}}},
 
 	{"i2f",         {CT_INSTR_CAST_I2F,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 	{"f2i",         {CT_INSTR_CAST_F2I,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},

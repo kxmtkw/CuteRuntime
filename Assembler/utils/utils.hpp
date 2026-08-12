@@ -89,7 +89,26 @@ namespace CtUtils {
 				return false;
 			}
 	
-			i = (int16_t) val;
+			i = (int32_t) val;
+			
+			return true;
+	
+		} catch (const std::out_of_range&) {
+			return false;
+		}
+	}
+
+	static bool 
+	str_to_u32(const std::string& str, int32_t& i) {
+
+		try {
+			int64_t val = std::stoull(str);
+	
+			if (val > UINT32_MAX) {
+				return false;
+			}
+	
+			i = (uint32_t) val;
 			
 			return true;
 	

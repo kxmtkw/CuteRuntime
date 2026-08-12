@@ -158,9 +158,8 @@ ct_runtime_exec(CtRuntime* runtime, CtContext* ctx) {
 		[CT_INSTR_MOV]        = &&HANDLER_MOV,
 		[CT_INSTR_LOAD_I16]   = &&HANDLER_LOAD_I16,
 		[CT_INSTR_LOAD_I32]   = &&HANDLER_LOAD_I32,
-		[CT_INSTR_LOAD_I64]   = &&HANDLER_LOAD_I64,
+		[CT_INSTR_LOAD_U32]   = &&HANDLER_LOAD_U32,
 		[CT_INSTR_LOAD_F32]   = &&HANDLER_LOAD_F32,
-		[CT_INSTR_LOAD_F64]   = &&HANDLER_LOAD_F64,
 
 		[CT_INSTR_CAST_I2F]    = &&HANDLER_CAST_I2F,
 		[CT_INSTR_CAST_F2I]    = &&HANDLER_CAST_F2I,
@@ -346,22 +345,16 @@ HANDLER_LOAD_I32:
 	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=(int32_t)ct_image_byteswap_u32(i32)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
-HANDLER_LOAD_I64:
+HANDLER_LOAD_U32:
 	r1 = instrs[ctx->ip++];
-	_ct_load_bytes(instrs, &ctx->ip, 8, &i64);
-	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_int=(int64_t)ct_image_byteswap_u64(i64)}, CT_ATOM_PRIMITIVE);
+	_ct_load_bytes(instrs, &ctx->ip, 4, &u32);
+	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_uint=(uint32_t)ct_image_byteswap_u32(u32)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_LOAD_F32:
 	r1 = instrs[ctx->ip++];
 	_ct_load_bytes(instrs, &ctx->ip, 4, &f32);
 	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_float=ct_image_byteswap_f32(f32)}, CT_ATOM_PRIMITIVE);
-	NEXT();
-
-HANDLER_LOAD_F64:
-	r1 = instrs[ctx->ip++];
-	_ct_load_bytes(instrs, &ctx->ip, 4, &f64);
-	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_float=ct_image_byteswap_f64(f64)}, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_ADDI: 

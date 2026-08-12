@@ -186,6 +186,23 @@ void CtCodeGen::parse_operand(CtInstrOperandType optype) {
 		throw_error("Expected int32.");
 	} 
 
+	else if (optype == CtInstrOperandType::U32) {
+
+		if (mStream.expect_type(CtTokenType::Int, &val)) {
+			int32_t number;
+
+			if (!CtUtils::str_to_u32(val, number)) {
+				throw_error("Number too large to fit inside uint32.");
+			}
+			std::cout << "Read: " << number << "\n";
+			ct_image_builder_add_u32(&mBuilder, static_cast<uint32_t>(number));
+			return;
+
+		} 
+
+		throw_error("Expected uint32.");
+	}
+
 	else if (optype == CtInstrOperandType::I64) {
 		if (!mStream.expect_type(CtTokenType::Int, &val)) {
 			throw_error("Expected int64.");
@@ -255,7 +272,7 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 
 	mStream = stream;
 
-	ct_image_builder_init(&mBuilder, 16, 64);
+	ct_image_builder_init(&mBuilder, 16, 16, 64);
 
 	while (!mStream.eof()) {
 		
@@ -264,6 +281,7 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 		}
 	}
 
+	ct_image_print(&mBuilder.image);
 	ct_image_dump(&mBuilder.image, outpath.data());
 }
 
