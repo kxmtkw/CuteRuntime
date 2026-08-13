@@ -22,6 +22,8 @@ class CtCodeGen {
 
 	CtTokenStream mStream;
 
+	unsigned int mProcedureCount = 1;
+	
 	std::unordered_set<std::string> mDefinedSymbols;
 	
 	std::unordered_map<std::string, uint32_t> mJumpAddresses;

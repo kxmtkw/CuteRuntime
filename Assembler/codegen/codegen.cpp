@@ -32,13 +32,19 @@ CtCodeGen::parse_procedure() {
 		return;
 	}
 
+	if (mDefinedSymbols.contains(val)) {
+		throw_error(std::format("Redefinition of identifier '{}'", val));
+	}
+
 
 	if (val == "main") {
+		mProcedureMap["main"] = 0;
 		mMainFound = true;
 	} else {
-		mProcedureMap[val] = mProcedureMap.size();	
+		mProcedureMap[val] = mProcedureCount++;	
 	}
-	
+
+	mDefinedSymbols.insert(val);
 	uint32_t id = mProcedureMap[val];
 
 	if (!(mStream.expect_token(":") &&mStream.expect_type(CtTokenType::Int, &val))) {
@@ -93,7 +99,12 @@ CtCodeGen::parse_label() {
 		throw_error("Expected indentifier as label name.");
 	}
 
+	if (mDefinedSymbols.contains(label)) {
+		throw_error(std::format("Redefinition of identifier '{}'", label));
+	}
+
 	mJumpAddresses[label] = mBuilder.image.header.instruction_count;
+	mDefinedSymbols.insert(label);
 	
 	if (!mStream.expect_token(";")) {
 		throw_error("Statement should have ended here. Expected ;");
@@ -270,6 +281,10 @@ CtCodeGen::resolve_jumps() {
 		}
 	}
 
+	for (auto item: mJumpAddresses) {
+		mDefinedSymbols.erase(item.first);
+	}
+
 	for (auto found: found_patches) {
 		auto it = mPatches.find(found);
 		if (it != mPatches.end()) {
@@ -310,8 +325,6 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 	mStream = stream;
 
 	ct_image_builder_init(&mBuilder, 16, 16, 64);
-
-	mProcedureMap["main"] = 0;
 
 	while (!mStream.eof()) {
 		
