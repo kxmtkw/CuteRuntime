@@ -294,7 +294,7 @@ void ct_image_print(const CtImage* image) {
 	printf("  Instruction Count: 0x%X (%u)\n", (unsigned int)image->header.instruction_count, (unsigned int)image->header.instruction_count);
 	printf("---------------------------------------------\n");
 
-	printf("Procedure Table Address: %p\n", (void*)image->procedure_table);
+	printf("Procedure Table:\n");
 	if (image->procedure_table && image->header.procedure_count > 0) {
 		for (uint32_t i = 0; i < image->header.procedure_count; ++i) {
 			printf("  Proc [%04X]: Bytecode Index = 0x%08X, Arg Count = 0x%X (%u)\n",
@@ -308,10 +308,10 @@ void ct_image_print(const CtImage* image) {
 	}
 
 	printf("---------------------------------------------\n");
-	printf("Instruction Pool Address: %p\n", (void*)image->instruction_pool);
+	printf("Instruction Pool:\n");
 	if (image->instruction_pool && image->header.instruction_count > 0) {
 		for (uint32_t i = 0; i < image->header.instruction_count; ++i) {
-			printf("  Instr [%04X]: 0x%08X\n",
+			printf("  Instr [%08X]: 0x%02X\n",
 				   (unsigned int)i,
 				   (unsigned int)image->instruction_pool[i]);
 		}
