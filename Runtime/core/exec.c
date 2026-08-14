@@ -88,9 +88,9 @@ _ct_inc_atom(CtContext* ctx, uint8_t slot) {
 	if (ctx->current_frame->file.types[slot] == CT_ATOM_OBJECT) {
 		ct_objects_dec_ref(ctx->objects, ctx->current_frame->file.atoms[slot].as_object);
 		ctx->current_frame->object_field_count--;
-	};
+		ctx->current_frame->file.types[slot] = CT_ATOM_PRIMITIVE;
+	}
 	ctx->current_frame->file.atoms[slot].as_uint++;
-	ctx->current_frame->file.types[slot] = CT_ATOM_PRIMITIVE;
 };
 
 
@@ -99,9 +99,9 @@ _ct_dec_atom(CtContext* ctx, uint8_t slot) {
 	if (ctx->current_frame->file.types[slot] == CT_ATOM_OBJECT) {
 		ct_objects_dec_ref(ctx->objects, ctx->current_frame->file.atoms[slot].as_object);
 		ctx->current_frame->object_field_count--;
+		ctx->current_frame->file.types[slot] = CT_ATOM_PRIMITIVE;
 	};
 	ctx->current_frame->file.atoms[slot].as_uint--;
-	ctx->current_frame->file.types[slot] = CT_ATOM_PRIMITIVE;
 };
 
 
@@ -244,13 +244,11 @@ ct_runtime_exec(CtRuntime* runtime, CtContext* ctx) {
 
 	CtInstrSize* instrs = runtime->image.instruction_pool;
 
-	uint8_t r1, r2, r3, r4, r5;
+	uint8_t r1, r2, r3, r4;
 	int16_t i16;
 	int32_t i32;
-	int64_t i64;
 	uint32_t u32;
 	float f32;
-	double f64;
 	CtAtom a1, a2, a3;
 	CtAtomType t1, t2, t3;
 	CtTypedAtom typed_atom;
