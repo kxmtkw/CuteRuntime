@@ -13,25 +13,22 @@ extern "C" {
 
 enum class CtInstrOperandType {
 	Slot,
-	I8,
+	Byte,
 	I16,
 	I32,
 	U32,
-	I64,
 	F32,
-	F64
 };
 
 static unsigned int 
 ct_instr_operand_size(CtInstrOperandType type) {
 	switch (type) {
 		case CtInstrOperandType::Slot: return 1;
-		case CtInstrOperandType::I8:   return 1;
+		case CtInstrOperandType::Byte:   return 1;
 		case CtInstrOperandType::I16:  return 2;
 		case CtInstrOperandType::I32:  return 4;
-		case CtInstrOperandType::I64:  return 8;
+		case CtInstrOperandType::U32:  return 4;
 		case CtInstrOperandType::F32:  return 4;
-		case CtInstrOperandType::F64:  return 8;
 	}
 	return 0;
 }
@@ -42,7 +39,7 @@ static const std::map<std::string, std::pair<CtInstr, std::vector<CtInstrOperand
 	{"halt",        {CT_INSTR_HALT,        {CtInstrOperandType::Slot}}},
 	{"null",        {CT_INSTR_NULL,        {}}},
 
-	{"out",         {CT_INSTR_OUT,         {CtInstrOperandType::I8, CtInstrOperandType::Slot}}},
+	{"out",         {CT_INSTR_OUT,         {CtInstrOperandType::Byte, CtInstrOperandType::Slot}}},
 
 	{"mov",         {CT_INSTR_MOV,         {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 
@@ -50,6 +47,7 @@ static const std::map<std::string, std::pair<CtInstr, std::vector<CtInstrOperand
 	{"loadi32",        {CT_INSTR_LOAD_I32,    {CtInstrOperandType::Slot, CtInstrOperandType::I32}}},
 	{"loadu32",        {CT_INSTR_LOAD_U32,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
 	{"loadf32",        {CT_INSTR_LOAD_F32,    {CtInstrOperandType::Slot, CtInstrOperandType::F32}}},
+	{"loadbyte",      {CT_INSTR_LOAD_BYTE,    {CtInstrOperandType::Slot, CtInstrOperandType::Byte}}},
 
 	{"i2f",         {CT_INSTR_CAST_I2F,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 	{"f2i",         {CT_INSTR_CAST_F2I,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
