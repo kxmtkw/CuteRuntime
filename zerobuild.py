@@ -3,9 +3,10 @@ from zero import *
 build = Build()
 
 build.compiler = "gcc"
-build.directory = ".build"
+build.directory = "build"
 build.arguments = Flags.Wall, Flags.Wextra, Flags.g
 
+build.export_compile_commands = True
 
 # Cute Instructions
 
