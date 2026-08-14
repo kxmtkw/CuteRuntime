@@ -18,6 +18,7 @@ typedef enum {
     CT_INSTR_LOAD_I32      = 0x22,
     CT_INSTR_LOAD_U32      = 0x23,
     CT_INSTR_LOAD_F32      = 0x24,
+	CT_INSTR_LOAD_BYTE     = 0x25,
 
     CT_INSTR_CAST_I2F     = 0x2A,
     CT_INSTR_CAST_F2I     = 0x2B,
@@ -144,10 +145,6 @@ ct_image_builder_del(CtImageBuilder* builder);
 uint32_t
 ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_count);
 
-// Get the current active address in the instruction pool.
-uint8_t*
-ct_image_builder_current_address(CtImageBuilder* builder);
-
 // Get the address of a specific byte offset in the pool.
 uint8_t*
 ct_image_builder_get_address(CtImageBuilder* builder, uint32_t index);
@@ -160,27 +157,20 @@ ct_image_builder_add_instr(CtImageBuilder* builder, CtInstrSize instr);
 void
 ct_image_builder_add_u8(CtImageBuilder* builder, uint8_t i);
 
-// Add a u16 to the instruction pool
+// Add a u16 to the instruction pool. Handles endian-ness
 void
 ct_image_builder_add_u16(CtImageBuilder* builder, uint16_t i);
 
-// Add a u32 to the instruction pool
+// Add a u32 to the instruction pool.  Handles endian-ness
 void
 ct_image_builder_add_u32(CtImageBuilder* builder, uint32_t i);
 
-// Add a u64 to the instruction pool
-void
-ct_image_builder_add_u64(CtImageBuilder* builder, uint64_t i);
-
-// Add a f32 to the instruction pool
+// Add a f32 to the instruction pool. Handles endian-ness
 void
 ct_image_builder_add_f32(CtImageBuilder* builder, float f);
 
-// Add a f64 to the instruction pool
-void
-ct_image_builder_add_f64(CtImageBuilder* builder, double f);
-
-// Add data to the data blob, returns the offset
+// Add data to the data blob, returns the offset.
+// Does NOT handle endian-ness for integars, thats the user's responsibility.
 uint32_t
 ct_image_builder_append_data(CtImageBuilder* builder, uint8_t* data, uint32_t size);
 

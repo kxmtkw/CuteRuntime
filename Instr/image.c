@@ -97,36 +97,22 @@ ct_image_builder_new_proc(CtImageBuilder* builder, uint32_t id, uint32_t arg_cou
 
 
 uint8_t*
-ct_image_builder_current_address(CtImageBuilder* builder) {
-	if (!builder || !builder->image.instruction_pool) {
+ct_image_builder_get_address(CtImageBuilder* builder, uint32_t index) {
+	if (!builder || !builder->image.instruction_pool || index >= builder->image.header.instruction_count) {
 		return NULL;
 	}
-	return builder->image.instruction_pool + builder->image.header.instruction_count;
+	return &builder->image.instruction_pool[index];
 }
-
-
-uint8_t*
-ct_image_builder_get_address(CtImageBuilder* builder, uint32_t index) {
-	{
-		if (!builder || !builder->image.instruction_pool || index >= builder->image.header.instruction_count) {
-			return NULL;
-		}
-		return &builder->image.instruction_pool[index];
-	}
-}
-
 
 
 void 
 ct_image_builder_add_instr(CtImageBuilder* builder, CtInstrSize instr) {
-	
 	ct_image_builder_add_u8(builder, instr);
 }
 
 
 void 
 ct_image_builder_add_u8(CtImageBuilder* builder, uint8_t i) {
-
 	_ct_ensure_instr_cap(builder, sizeof(uint8_t));
 	builder->image.instruction_pool[builder->image.header.instruction_count++] = i;
 }
@@ -151,29 +137,11 @@ ct_image_builder_add_u32(CtImageBuilder* builder, uint32_t i) {
 
 
 void 
-ct_image_builder_add_u64(CtImageBuilder* builder, uint64_t i) {
-	i = ct_image_byteswap_u64(i);
-	_ct_ensure_instr_cap(builder, sizeof(uint64_t));
-	memcpy(builder->image.instruction_pool + builder->image.header.instruction_count, &i, sizeof(uint64_t));
-	builder->image.header.instruction_count += sizeof(uint64_t);
-}
-
-
-void 
 ct_image_builder_add_f32(CtImageBuilder* builder, float f) {
 	f = ct_image_byteswap_f32(f);
 	_ct_ensure_instr_cap(builder, sizeof(float));
 	memcpy(builder->image.instruction_pool + builder->image.header.instruction_count, &f, sizeof(float));
 	builder->image.header.instruction_count += sizeof(float);
-}
-
-
-void 
-ct_image_builder_add_f64(CtImageBuilder* builder, double f) {
-	f = ct_image_byteswap_f64(f);
-	_ct_ensure_instr_cap(builder, sizeof(double));
-	memcpy(builder->image.instruction_pool + builder->image.header.instruction_count, &f, sizeof(double));
-	builder->image.header.instruction_count += sizeof(double);
 }
 
 
