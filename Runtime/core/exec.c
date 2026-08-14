@@ -129,6 +129,8 @@ _ct_out(uint8_t fmt, CtAtom atom) {
 		case 5:
 			printf("[ bool %s ]\n", atom.as_bool ? "true" : "false"); break;
 		case 6:
+			printf("[ char %c ]\n", (char) atom.as_uint); break;
+		case 7:
 			printf("[ object %p ]\n", atom.as_object); break;
 		default:
 			printf("[ hexadecimal 0x%016lX (unk-format %u) ]\n", (uint64_t)atom.raw, fmt);
@@ -363,7 +365,7 @@ HANDLER_LOAD_BYTE:
 	r2 = instrs[ctx->ip++];
 	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_uint=r2}, CT_ATOM_PRIMITIVE);
 	NEXT();
-	
+
 HANDLER_ADDI: 
 	CT_INSTR_BINARYOP(CT_ATOM_PRIMITIVE, as_int, +); 
 	NEXT();
