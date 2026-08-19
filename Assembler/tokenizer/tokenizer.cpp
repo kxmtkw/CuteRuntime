@@ -216,11 +216,12 @@ CtTokenStream CtTokenizer::tokenize(std::string source) {
 
 	while (mCurrent < mSize) {
 
-		eat_whitspace();
-
 		c = peek();
 
-		if (std::isalpha(c) or c == '_') {
+		if (c == ' ' or c == '\n' or c == '\t') {
+			next();
+		}
+		else if (std::isalpha(c) or c == '_') {
 			tokenize_word();
 		}
 		else if (std::isdigit(c)) {
