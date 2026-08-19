@@ -20,6 +20,10 @@ typedef enum {
     CT_INSTR_LOAD_F32      = 0x24,
 	CT_INSTR_LOAD_BYTE     = 0x25,
 
+	CT_INSTR_READ_I64      = 0x26,
+	CT_INSTR_READ_U64      = 0x27,
+	CT_INSTR_READ_F64      = 0x28,
+
     CT_INSTR_CAST_I2F     = 0x2A,
     CT_INSTR_CAST_F2I     = 0x2B,
     CT_INSTR_CAST_U2F     = 0x2C,
