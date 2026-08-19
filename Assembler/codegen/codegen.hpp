@@ -31,8 +31,19 @@ class CtCodeGen {
 
 	std::unordered_map<uint32_t, std::string> mPatches;
 
+	std::unordered_map<uint32_t, uint32_t> mDataVars;
+
 	bool mMainFound = false;
 	
+
+	// Parse the data section
+	void
+	parse_data_section();
+
+	// Parse the data section
+	void
+	parse_data();
+
 	// Parse a procedure
 	void
 	parse_procedure();

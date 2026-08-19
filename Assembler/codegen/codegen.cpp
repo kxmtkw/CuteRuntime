@@ -20,6 +20,48 @@ extern "C" {
 using std::byte;
 
 
+
+void
+CtCodeGen::parse_data_section() {
+
+	if (!mStream.expect_token("{")) {
+		throw_error("Expected { after data section declaration.");
+		return;
+	}
+
+
+	while (!mStream.expect_token("}")) {
+		parse_data();
+	}
+
+}
+
+
+void
+CtCodeGen::parse_data() {
+
+	std::string val;
+
+	if (mStream.expect_type(CtTokenType::Int, &val)) {
+		int64_t i;
+		CtUtils::str_to_i64(val, i);
+		int32_t index = mDataVars.size();
+		int32_t offset = ct_image_builder_append_data(&mBuilder, (uint8_t*)&i, sizeof(i));
+		mDataVars[index] = offset;
+	} else if (mStream.expect_type(CtTokenType::Float, &val)) {
+		double i;
+		CtUtils::str_to_f64(val, i);
+		int32_t index = mDataVars.size();
+		int32_t offset = ct_image_builder_append_data(&mBuilder, (uint8_t*)&i, sizeof(i));
+		mDataVars[index] = offset;
+	} else {
+		throw_error("Did not expect this token in data section.");
+	}
+
+	mStream.expect_token(",");
+}
+
+
 void
 CtCodeGen::parse_procedure() {
 
@@ -35,7 +77,6 @@ CtCodeGen::parse_procedure() {
 	if (mDefinedSymbols.contains(val)) {
 		throw_error(std::format("Redefinition of identifier '{}'", val));
 	}
-
 
 	if (val == "main") {
 		mProcedureMap["main"] = 0;
@@ -307,7 +348,15 @@ CtCodeGen::generate(CtTokenStream stream, std::string outpath) {
 		
 		if (mStream.expect_token("proc")) {
 			parse_procedure();
+			continue;
 		}
+
+		if (mStream.expect_token("data")) {
+			parse_data_section();
+			continue;
+		}
+
+		throw_error("unexpected token.");
 	}
 
 	resolve_procedures();
