@@ -249,42 +249,53 @@ ct_image_free(CtImage* img)
 
 
 void ct_image_print(const CtImage* image) {
-	if (!image) {
-		printf("CtImage: NULL\n");
-		return;
-	}
+    if (!image) {
+        printf("CtImage: NULL\n");
+        return;
+    }
 
-	printf("================ [ CtImage ] ================\n");
-	printf("Header:\n");
-	printf("  Magic ID:          0x%08X\n", (unsigned int)image->header.magic_id);
-	printf("  Version:           0x%08X (%u)\n", (unsigned int)image->header.version, (unsigned int)image->header.version);
-	printf("  Procedure Count:   0x%X (%u)\n", (unsigned int)image->header.procedure_count, (unsigned int)image->header.procedure_count);
-	printf("  Instruction Count: 0x%X (%u)\n", (unsigned int)image->header.instruction_count, (unsigned int)image->header.instruction_count);
-	printf("---------------------------------------------\n");
+    printf("================ [ CtImage ] ================\n");
+    printf("Header:\n");
+    printf("  Magic ID:          0x%08X\n", (unsigned int)image->header.magic_id);
+    printf("  Version:           0x%08X (%u)\n", (unsigned int)image->header.version, (unsigned int)image->header.version);
+    printf("  Data Blob Size:    0x%08X (%u bytes)\n", (unsigned int)image->header.data_blob_size, (unsigned int)image->header.data_blob_size);
+    printf("  Procedure Count:   0x%X (%u)\n", (unsigned int)image->header.procedure_count, (unsigned int)image->header.procedure_count);
+    printf("  Instruction Count: 0x%X (%u)\n", (unsigned int)image->header.instruction_count, (unsigned int)image->header.instruction_count);
+    printf("---------------------------------------------\n");
 
-	printf("Procedure Table:\n");
-	if (image->procedure_table && image->header.procedure_count > 0) {
-		for (uint32_t i = 0; i < image->header.procedure_count; ++i) {
-			printf("  Proc [%04X]: Bytecode Index = 0x%08X, Arg Count = 0x%X (%u)\n",
-				   (unsigned int)i,
-				   (unsigned int)image->procedure_table[i].bytecode_index,
-				   (unsigned int)image->procedure_table[i].arg_count,
-				   (unsigned int)image->procedure_table[i].arg_count);
-		}
-	} else {
-		printf("  (empty or null procedure table)\n");
-	}
+    printf("Data Blob:\n");
+    if (image->data_blob && image->header.data_blob_size > 0) {
+        for (uint32_t i = 0; i < image->header.data_blob_size; ++i) {
+            printf("  Blob [%08X]: 0x%02X\n", (unsigned int)i, (unsigned int)image->data_blob[i]);
+        }
+    } else {
+        printf("  (empty or null data blob)\n");
+    }
 
-	printf("---------------------------------------------\n");
-	printf("Instruction Pool:\n");
-	if (image->instruction_pool && image->header.instruction_count > 0) {
-		for (uint32_t i = 0; i < image->header.instruction_count; ++i) {
-			printf("  Instr [%08X]: 0x%02X\n",
-				   (unsigned int)i,
-				   (unsigned int)image->instruction_pool[i]);
-		}
-	} else {
-		printf("  (empty or null instruction pool)\n");
-	}
-	printf("=============================================\n");
+    printf("---------------------------------------------\n");
+    printf("Procedure Table:\n");
+    if (image->procedure_table && image->header.procedure_count > 0) {
+        for (uint32_t i = 0; i < image->header.procedure_count; ++i) {
+            printf("  Proc [%04X]: Bytecode Index = 0x%08X, Arg Count = 0x%X (%u)\n",
+                   (unsigned int)i,
+                   (unsigned int)image->procedure_table[i].bytecode_index,
+                   (unsigned int)image->procedure_table[i].arg_count,
+                   (unsigned int)image->procedure_table[i].arg_count);
+        }
+    } else {
+        printf("  (empty or null procedure table)\n");
+    }
+
+    printf("---------------------------------------------\n");
+    printf("Instruction Pool:\n");
+    if (image->instruction_pool && image->header.instruction_count > 0) {
+        for (uint32_t i = 0; i < image->header.instruction_count; ++i) {
+            printf("  Instr [%08X]: 0x%02X\n",
+                   (unsigned int)i,
+                   (unsigned int)image->instruction_pool[i]);
+        }
+    } else {
+        printf("  (empty or null instruction pool)\n");
+    }
+    printf("=============================================\n");
 }
