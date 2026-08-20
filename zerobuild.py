@@ -5,7 +5,7 @@ from zero import *
 debug = UserOptions.get("debug")
 debug = True if debug == "true" else False
 
-DEBUG_MACRO = "-DCT_CONF_DEBUG"
+DEBUG_MACRO = Macro("CT_CONF_DEBUG")
 
 
 #  Configuration
