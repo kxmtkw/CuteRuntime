@@ -208,7 +208,8 @@ ct_image_load(CtImage *img, const char *filepath) {
 		return CT_IMAGE_STATUS_CORRUPTED_IMAGE;
 	}
 
-	if (memcmp(&img->header.version, &ct_version, sizeof(ct_version)) == 0) {
+	if (memcmp(&img->header.version, &ct_version, sizeof(ct_version)) != 0) {
+		img->header.magic_id = 0;
 		return CT_IMAGE_STATUS_VERSION_MISTMATCH;
 	}
 
