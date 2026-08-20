@@ -2,11 +2,16 @@ from zero import *
 
 build = Build()
 
-build.compiler = "gcc"
 build.directory = "build"
+
+build.default_compiler = "gcc"
 build.arguments = Flags.Wall, Flags.Wextra, Flags.g
 
+build.compilers.arguments["gcc"] = Flags.std_c17
+build.compilers.arguments["g++"] = Flags.std_cpp20
+
 build.export_compile_commands = True
+
 
 # Cute Instructions
 
