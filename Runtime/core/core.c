@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "Cute.h"
 
@@ -82,8 +83,7 @@ ct_runtime_load(CtRuntime* runtime, const char* filepath) {
 				runtime->error, 
 				"Runtime", 
 				"VersionMismatch", 
-				"Version mismatch. runtime is v%u but image '%s' is v%u.", 
-				CT_CUTE_VERSION, filepath, runtime->image.header.version
+				"Version mismatch.", NULL
 			);
 			break;
 
