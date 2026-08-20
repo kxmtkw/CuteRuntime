@@ -1,10 +1,19 @@
 from zero import *
 
+# Options
+
+debug = UserOptions.get("debug")
+debug = True if debug == "true" else False
+
+DEBUG_MACRO = "-DCT_CONF_DEBUG"
+
+
+#  Configuration
+
 build = Build()
 
-build.directory = "build"
-
 build.default_compiler = "gcc"
+build.directory = "build"
 build.arguments = Flags.Wall, Flags.Wextra, Flags.g
 
 build.compilers.arguments["gcc"] = Flags.std_c17
@@ -25,11 +34,8 @@ CuteInstr.headers.public = Path("Instr") / "include"
 # Cute Engine
 
 CuteRuntime = StaticLibrary()
-CuteRuntime.compiler = "gcc"
 
 src = Path("Runtime")
-
-CuteRuntime.link(CuteInstr)
 CuteRuntime.headers.public = src / "include"
 CuteRuntime.headers.private = src
 
@@ -44,12 +50,17 @@ CuteRuntime.source = Source(
 	src / "lib" / "buffer.c",
 )
 
+CuteRuntime.link(CuteInstr)
+
+if debug:
+	CuteRuntime.arguments = DEBUG_MACRO
+
 
 # cute binary
 
 cute = Executable()
-cute.link(CuteRuntime)
 cute.source = Source("main/runtime.c")
+cute.link(CuteRuntime)
 
 
 # Cute Assembler
@@ -61,8 +72,6 @@ src = Path("Assembler")
 
 CuteAsm.headers.private = src
 CuteAsm.headers.public = src / "include"
-CuteAsm.link(CuteInstr)
-
 CuteAsm.source = Source(
 	src / "tokenizer" / "tokenizer.cpp",
 	src / "tokenizer" / "stream.cpp",
@@ -70,10 +79,12 @@ CuteAsm.source = Source(
 	src / "assembler" / "assembler.cpp"
 )
 
+CuteAsm.link(CuteInstr)
+
 
 # cuteasm binary
 
 cuteasm = Executable()
 cuteasm.compiler = CuteAsm.compiler
-cuteasm.link(CuteAsm)
 cuteasm.source = Source("main/assembler.cpp")
+cuteasm.link(CuteAsm)
