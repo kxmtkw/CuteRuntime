@@ -70,6 +70,10 @@ ct_ctx_return_procedure(CtContext* ctx, CtAtom returned_atom, CtAtomType returne
 void
 ct_ctx_modcall(CtContext* ctx, uint32_t module_id, uint32_t method_id, uint8_t arg_start_slot, uint8_t return_slot);
 
+// Read data from the data portion of the image
+const uint8_t*
+ct_ctx_read_data(CtContext* ctx, uint32_t index);
+
 // Get the object manager pointer of this context
 CtObjectManager*
 ct_ctx_get_object_manager(CtContext* ctx);

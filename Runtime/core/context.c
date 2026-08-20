@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "CuteInstr.h"
 
@@ -227,6 +228,23 @@ ct_ctx_modcall(CtContext* ctx, uint32_t module_id, uint32_t method_id, uint8_t a
 	if (result.returned_type == CT_ATOM_OBJECT) {
 		ct_objects_inc_ref(ctx->objects, result.returned_atom.as_object);
 	}
+};
+
+
+const uint8_t*
+ct_ctx_read_data(CtContext* ctx, uint32_t index) {
+
+	if (index >= ctx->image->header.data_blob_size) {
+		CT_ERROR_RUNTIME(
+			ct_thread_error, 
+			"Runtime", 
+			"InvalidAccess", 
+			"Cannot access data.", NULL
+		);
+		return NULL;
+	}
+
+	return (ctx->image->data_blob + index);
 };
 
 

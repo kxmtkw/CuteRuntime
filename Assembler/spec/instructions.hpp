@@ -47,8 +47,12 @@ static const std::map<std::string, std::pair<CtInstr, std::vector<CtInstrOperand
 	{"loadi32",        {CT_INSTR_LOAD_I32,    {CtInstrOperandType::Slot, CtInstrOperandType::I32}}},
 	{"loadu32",        {CT_INSTR_LOAD_U32,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
 	{"loadf32",        {CT_INSTR_LOAD_F32,    {CtInstrOperandType::Slot, CtInstrOperandType::F32}}},
-	{"loadbyte",      {CT_INSTR_LOAD_BYTE,    {CtInstrOperandType::Slot, CtInstrOperandType::Byte}}},
+	{"loadbyte",       {CT_INSTR_LOAD_BYTE,    {CtInstrOperandType::Slot, CtInstrOperandType::Byte}}},
 
+	{"readi64",      {CT_INSTR_READ_I64,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
+	{"readu64",      {CT_INSTR_READ_U64,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
+	{"readf64",      {CT_INSTR_READ_F64,    {CtInstrOperandType::Slot, CtInstrOperandType::U32}}},
+	
 	{"i2f",         {CT_INSTR_CAST_I2F,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 	{"f2i",         {CT_INSTR_CAST_F2I,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},
 	{"u2f",         {CT_INSTR_CAST_U2F,    {CtInstrOperandType::Slot, CtInstrOperandType::Slot}}},

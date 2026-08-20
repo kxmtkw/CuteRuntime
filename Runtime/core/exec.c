@@ -164,6 +164,10 @@ ct_runtime_exec(CtRuntime* runtime, CtContext* ctx) {
 		[CT_INSTR_LOAD_F32]   = &&HANDLER_LOAD_F32,
 		[CT_INSTR_LOAD_BYTE]  = &&HANDLER_LOAD_BYTE,
 
+		[CT_INSTR_READ_I64]   = &&HANDLER_READ_I64,
+		[CT_INSTR_READ_U64]   = &&HANDLER_READ_U64,
+		[CT_INSTR_READ_F64]   = &&HANDLER_READ_F64,
+
 		[CT_INSTR_CAST_I2F]    = &&HANDLER_CAST_I2F,
 		[CT_INSTR_CAST_F2I]    = &&HANDLER_CAST_F2I,
 		[CT_INSTR_CAST_U2F]    = &&HANDLER_CAST_U2F,
@@ -362,6 +366,27 @@ HANDLER_LOAD_BYTE:
 	r1 = instrs[ctx->ip++];
 	r2 = instrs[ctx->ip++];
 	ct_ctx_store_atom(ctx, r1, (CtAtom){.as_uint=r2}, CT_ATOM_PRIMITIVE);
+	NEXT();
+
+HANDLER_READ_I64:
+	r1 = instrs[ctx->ip++];
+	_ct_load_bytes(instrs, &ctx->ip, sizeof(u32), &u32);
+	a1.as_int = *(int64_t*)ct_ctx_read_data(ctx, u32);
+	ct_ctx_store_atom(ctx, r1, a1, CT_ATOM_PRIMITIVE);
+	NEXT();
+
+HANDLER_READ_U64:
+	r1 = instrs[ctx->ip++];
+	_ct_load_bytes(instrs, &ctx->ip, sizeof(u32), &u32);
+	a1.as_uint = *(uint64_t*)ct_ctx_read_data(ctx, u32);
+	ct_ctx_store_atom(ctx, r1, a1, CT_ATOM_PRIMITIVE);
+	NEXT();
+
+HANDLER_READ_F64:
+	r1 = instrs[ctx->ip++];
+	_ct_load_bytes(instrs, &ctx->ip, sizeof(u32), &u32);
+	a1.as_float = *(double*)ct_ctx_read_data(ctx, u32);
+	ct_ctx_store_atom(ctx, r1, a1, CT_ATOM_PRIMITIVE);
 	NEXT();
 
 HANDLER_ADDI: 
