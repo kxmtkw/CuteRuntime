@@ -8,9 +8,16 @@ A `cute` image, represented by `.cute` files are compiled versions of `csm` file
 ```
 [Header]
 	[Magic Number](32)
-	[Version](32)
+	[Version]
+		[Major](16)
+		[Minor](16)
+		[Patch](16)
+	[Data Blob Size](32)
 	[Procedure Count](32)
 	[Instruction Count](32)
+[Data Blob]
+	[Byte]
+	...
 [Procedure Table]
 	[Procedure]
 		[Bytecode Index](32)

@@ -70,15 +70,6 @@ Reads an int and writes the value to $x.
 
 ---
 
-#### CT_INSTR_LOAD_I64        `0x23`
-Assembler Repr: `loadi64`
-```
-loadi64 $x imm64 // imm64 -> $x
-```
-Reads an int and writes the value to $x.
-
----
-
 #### CT_INSTR_LOAD_F32        `0x24`
 Assembler Repr: `loadf32`
 ```
@@ -88,12 +79,39 @@ Reads an int and writes the value to $x.
 
 ---
 
-#### CT_INSTR_LOAD_F64        `0x25`
-Assembler Repr: `loadf64`
+#### CT_INSTR_LOAD_BYTE        `0x25`
+Assembler Repr: `loadbyte`
 ```
-loadf64 $x imm64 // imm64 -> $x
+loadbyte $x imm8 // imm8 -> $x
 ```
-Reads an int and writes the value to $x.
+Reads a single byte and writes the value to $x.
+
+---
+
+#### CT_INSTR_READ_I64        `0x26`
+Assembler Repr: `readi64`
+```
+readi64 $x imm32 // imm64 -> $x
+```
+Loads an i64 from the data section with offset imm32.
+
+---
+
+#### CT_INSTR_READ_U64        `0x27`
+Assembler Repr: `readu64`
+```
+readu64 $x imm32 // imm64 -> $x
+```
+Loads an u64 from the data section with offset imm32.
+
+---
+
+#### CT_INSTR_READ_F64        `0x26`
+Assembler Repr: `readf64`
+```
+readf64 $x imm32 // imm64 -> $x
+```
+Loads an f64 from the data section with offset imm32.
 
 ---
 
@@ -378,8 +396,10 @@ Returns whatever is present in $x.
 
 #### CT_INSTR_MOD_CALL    `0xBA`
 Assembler Repr: `modcall`
-
-Unimplemented/Poorly implemented.
+```
+modcall $x $y $z $a;
+```
+Make a module call. $x holds the module id, $y holds the method id, $z is the argument start slot and $a is the return slot.
 
 ---
 
