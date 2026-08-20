@@ -12,7 +12,7 @@ ct_image_builder_init(CtImageBuilder* builder, uint32_t blob_reserve, uint32_t p
 	if (!builder) return;
 
 	builder->image.header.magic_id = ct_magic_id;
-	builder->image.header.version = CT_CUTE_VERSION;
+	builder->image.header.version = ct_version;
 	builder->image.header.data_blob_size = 0;
 	builder->image.header.procedure_count = 0;
 	builder->image.header.instruction_count = 0;
@@ -172,7 +172,7 @@ ct_image_dump(CtImage *img, const char *filepath) {
 	if (!fp) {return CT_IMAGE_STATUS_FILE_NOT_FOUND;}
 
 	img->header.magic_id = ct_magic_id;
-	img->header.version = CT_CUTE_VERSION;
+	img->header.version = ct_version;
 
 	uint32_t items_written;
 
@@ -208,7 +208,7 @@ ct_image_load(CtImage *img, const char *filepath) {
 		return CT_IMAGE_STATUS_CORRUPTED_IMAGE;
 	}
 
-	if (img->header.version != CT_CUTE_VERSION) {
+	if (memcmp(&img->header.version, &ct_version, sizeof(ct_version)) == 0) {
 		return CT_IMAGE_STATUS_VERSION_MISTMATCH;
 	}
 
@@ -256,17 +256,17 @@ void ct_image_print(const CtImage* image) {
 
     printf("================ [ CtImage ] ================\n");
     printf("Header:\n");
-    printf("  Magic ID:          0x%08X\n", (unsigned int)image->header.magic_id);
-    printf("  Version:           0x%08X (%u)\n", (unsigned int)image->header.version, (unsigned int)image->header.version);
-    printf("  Data Blob Size:    0x%08X (%u bytes)\n", (unsigned int)image->header.data_blob_size, (unsigned int)image->header.data_blob_size);
-    printf("  Procedure Count:   0x%X (%u)\n", (unsigned int)image->header.procedure_count, (unsigned int)image->header.procedure_count);
-    printf("  Instruction Count: 0x%X (%u)\n", (unsigned int)image->header.instruction_count, (unsigned int)image->header.instruction_count);
+    printf("  Magic ID:          0x%08X\n", image->header.magic_id);
+    printf("  Version:           %d.%d.%d\n", image->header.version.major, image->header.version.minor, image->header.version.patch);
+    printf("  Data Blob Size:    0x%08X (%u bytes)\n", image->header.data_blob_size, image->header.data_blob_size);
+    printf("  Procedure Count:   0x%X (%u)\n", image->header.procedure_count, image->header.procedure_count);
+    printf("  Instruction Count: 0x%X (%u)\n", image->header.instruction_count, image->header.instruction_count);
     printf("---------------------------------------------\n");
 
     printf("Data Blob:\n");
     if (image->data_blob && image->header.data_blob_size > 0) {
         for (uint32_t i = 0; i < image->header.data_blob_size; ++i) {
-            printf("  Blob [%08X]: 0x%02X\n", (unsigned int)i, (unsigned int)image->data_blob[i]);
+            printf("  Blob [%08X]: 0x%02X\n", i, image->data_blob[i]);
         }
     } else {
         printf("  (empty or null data blob)\n");
@@ -277,10 +277,10 @@ void ct_image_print(const CtImage* image) {
     if (image->procedure_table && image->header.procedure_count > 0) {
         for (uint32_t i = 0; i < image->header.procedure_count; ++i) {
             printf("  Proc [%04X]: Bytecode Index = 0x%08X, Arg Count = 0x%X (%u)\n",
-                   (unsigned int)i,
-                   (unsigned int)image->procedure_table[i].bytecode_index,
-                   (unsigned int)image->procedure_table[i].arg_count,
-                   (unsigned int)image->procedure_table[i].arg_count);
+                   i,
+                   image->procedure_table[i].bytecode_index,
+                   image->procedure_table[i].arg_count,
+                   image->procedure_table[i].arg_count);
         }
     } else {
         printf("  (empty or null procedure table)\n");
@@ -291,8 +291,8 @@ void ct_image_print(const CtImage* image) {
     if (image->instruction_pool && image->header.instruction_count > 0) {
         for (uint32_t i = 0; i < image->header.instruction_count; ++i) {
             printf("  Instr [%08X]: 0x%02X\n",
-                   (unsigned int)i,
-                   (unsigned int)image->instruction_pool[i]);
+                   i,
+                   image->instruction_pool[i]);
         }
     } else {
         printf("  (empty or null instruction pool)\n");

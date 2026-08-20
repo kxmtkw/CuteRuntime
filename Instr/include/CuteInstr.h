@@ -1,11 +1,24 @@
 #ifndef CUTE_INSTR_H
 #define CUTE_INSTR_H
 
-// Main Cute Instruction Set.
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+
+// Versioning
+
+typedef struct {
+	uint16_t major;
+	uint16_t minor;
+	uint16_t patch;
+} CtVersion;
+
+static const CtVersion ct_version = {1, 0, 0};
+
+
+// Main Cute Instruction Set.
 typedef enum {
 
     CT_INSTR_NULL         = 0x00,
@@ -107,7 +120,7 @@ typedef uint8_t CtDataBlobUnit;
 
 typedef struct {
 	uint32_t magic_id;
-	uint32_t version;
+	CtVersion version;
 	uint32_t data_blob_size;
 	uint32_t procedure_count;
 	uint32_t instruction_count;
@@ -306,10 +319,5 @@ ct_image_byteswap_f64(double value) {
 	memcpy(&value, &as_int, sizeof(uint64_t));
 	return value;
 }
-
-
-// Versioning
-
-#define CT_CUTE_VERSION 1
 
 #endif // CUTE_INSTR_H
